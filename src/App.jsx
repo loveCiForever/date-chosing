@@ -287,12 +287,12 @@ const App = () => {
 
       <div className="flex flex-col ml-[50px] bg-red-000 mb-20">
         {renderChosenPeopleList()}
-        <button
+        {/* <button
           onClick={handleClearStorage}
           className="px-4 py-2 bg-red-300 text-white rounded hover:bg-red-500"
         >
           Clear All Choices
-        </button>
+        </button> */}
       </div>
 
     </div>
