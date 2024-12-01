@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { format } from "date-fns";
 import Wave from 'react-wavify';
 
@@ -9,6 +9,25 @@ const App = () => {
   const [name, setName] = useState("");
   const [dateChoices, setDateChoices] = useState([]);
   const [hoveredDate, setHoveredDate] = useState(null);
+  const dialogRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dialogRef.current && !dialogRef.current.contains(event.target)) {
+        setIsDialogOpen(false);
+      }
+    };
+
+    if (isDialogOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isDialogOpen]);
 
   useEffect(() => {
     const storedChoices = localStorage.getItem("tripChoices");
@@ -119,8 +138,8 @@ const App = () => {
     });
 
     return (
-      <div className="my-6 ">
-        <h2 className="text-xl font-bold mb-2">Nững người bạn lẹ tay</h2>
+      <div className="mb-0 ">
+        <h2 className="text-xl font-bold mb-2">Những người đã chọn</h2>
         <ul className="list-disc pl-5">
           {Object.entries(peopleMap).length === 0 ? (
             <li>Chưa có ai tham gia</li>
@@ -141,9 +160,22 @@ const App = () => {
     setDateChoices([]);
   }
 
+  const getTopThreeDates = () => {
+    const dateCount = {};
+
+    dateChoices.forEach(choice => {
+      dateCount[choice.date] = choice.people.length;
+    });
+
+    const dateCountArray = Object.entries(dateCount);
+    dateCountArray.sort((a, b) => b[1] - a[1]);
+
+    return dateCountArray.slice(0, 3);
+  };
+
   return (
     <div className="min-h-screen bg-pink-50 flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-3xl shadow-lg max-w-md w-full mb-20">
+      <div className="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full mb-20">
         <h1 className="text-3xl font-bold mb-2 text-center text-gray-800">Vũng Tàu - Here we go</h1>
         <p className="text-lg text-gray-500 mb-6 text-center">Lựa ngày các bé rảnh đi nhé </p>
         <table className="w-full border-collapse bg-blue-000">
@@ -172,7 +204,9 @@ const App = () => {
 
       {isDialogOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-70 pb-20 flex items-center justify-center">
-          <div className="bg-white p-8 rounded-lg max-w-md w-full">
+          <div 
+            ref={dialogRef}
+            className="bg-white p-8 rounded-lg max-w-md w-full">
             <h2 className="text-2xl font-bold mb-4 text-center">Chắc chắn đi không vậy mẹ</h2>
             <p className="mb-10 text-sm text-center">
               {selectedDate
@@ -245,12 +279,13 @@ const App = () => {
           </svg>
 
           {/* highest wave */}
+          <div className="">
           <Wave
             fill="url(#seaGradient1)"
             paused={false}
             style={{ display: 'flex', position: 'absolute', bottom: 10, left: 0, right: 0 }}
             options={{
-              height: 0,
+              height: 2,
               amplitude: 50,
               speed: 0.15,
               points: 3
@@ -282,11 +317,26 @@ const App = () => {
               points: 3
             }}
           />
+          </div>
+          
         </div>
       )}
 
-      <div className="flex flex-col ml-[50px] bg-red-000 mb-20">
-        {renderChosenPeopleList()}
+      <div className="flex flex-col">
+        <div className="ml-[50px] mb-20 min-h-[200px] w-auto bg-white bg-red-000 rounded-2xl shadow-lg p-6">
+          <h2 className="text-xl font-bold text-center ">3 ngày được chọn nhiều nhất</h2>
+          <ul className="list-disc pl-5">
+            {getTopThreeDates().length === 0 ? (
+              <li>Chưa có ai tham gia</li>
+            ) : (
+              getTopThreeDates().map(([date, count]) => (
+                <li key={date}>
+                  {date}: {count} người đã chọn
+                </li>
+              ))
+            )}
+          </ul>
+        </div>
         {/* <button
           onClick={handleClearStorage}
           className="px-4 py-2 bg-red-300 text-white rounded hover:bg-red-500"
@@ -295,6 +345,10 @@ const App = () => {
         </button> */}
       </div>
 
+
+      <div className="flex flex-col ml-[50px] bg-red-000 mb-20 min-h-[200px] w-auto bg-white bg-red-000 rounded-2xl shadow-lg p-6">
+        {renderChosenPeopleList()}
+      </div>
     </div>
   );
 };
