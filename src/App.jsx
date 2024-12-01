@@ -88,7 +88,7 @@ const App = () => {
             onClick={() => handleDateSelect(date)}
             onMouseEnter={() => setHoveredDate(date)}
             onMouseLeave={() => setHoveredDate(null)}
-            className="w-full h-full py-[6px] bg-red-000 rounded-lg hover:bg-gray-300 hover"
+            className="sm:text-[16px] text-[14px] w-full h-full py-[6px] bg-red-000 rounded-lg hover:bg-gray-300 hover"
           >
             {day}
           </button>
@@ -138,11 +138,11 @@ const App = () => {
     });
 
     return (
-      <div className="mb-0 ">
-        <h2 className="text-xl font-bold mb-2">Những người đã chọn</h2>
-        <ul className="list-disc pl-5">
+      <div className="mb-0">
+        <h2 className="md:text-xl sm:text-[16px] text-[12px] font-bold mb-[10px] text-center">Những người đã chọn</h2>
+        <ul className="list-disc sm:pl-5 pl-[10px]">
           {Object.entries(peopleMap).length === 0 ? (
-            <li>Chưa có ai tham gia</li>
+            <li className="sm:text-[18px] text-[12px]">Chưa có ai tham gia</li>
           ) : (
             Object.entries(peopleMap).map(([person, dates]) => (
               <li key={person}>
@@ -174,17 +174,17 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-pink-50 flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-2xl shadow-lg max-w-md w-full mb-20">
-        <h1 className="text-3xl font-bold mb-2 text-center text-gray-800">Vũng Tàu - Here we go</h1>
-        <p className="text-lg text-gray-500 mb-6 text-center">Lựa ngày các bé rảnh đi nhé </p>
+    <div className="min-h-screen bg-pink-50 lg:flex flex-row block items-center justify-center p-3">
+      <div className="bg-white p-8 rounded-2xl shadow-lg lg:max-w-[30%] max-w-[100%] w-full lg:mb-20 mb-5">
+        <h1 className="lg:text-3xl md:text-5xl sm:text-4xl text-[24px] font-bold mb-2 text-center text-gray-800">Vũng Tàu - Here we go</h1>
+        <p className="lg:text-lg md:text-2xl sm:text-xl text-[14px] text-gray-500 sm:mb-6 mb-[10px] text-center">Lựa ngày các bé rảnh đi nhé </p>
         <table className="w-full border-collapse bg-blue-000">
 
           {/* Day */}
           <thead className="bg-red-000">
             <tr>
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                <th key={day} className="py-2 flex-grow">{day}</th>
+                <th key={day} className="sm:text-[16px] text-[14px] py-2 flex-grow">{day}</th>
               ))}
             </tr>
           </thead>
@@ -278,7 +278,7 @@ const App = () => {
             </defs>
           </svg>
 
-          
+
           <div className="">
             {/* highest wave */}
             {/* <Wave
@@ -323,12 +323,12 @@ const App = () => {
         </div>
       )}
 
-      <div className="flex flex-col">
-        <div className="ml-[50px] mb-20 min-h-[200px] w-auto bg-white bg-red-000 rounded-2xl shadow-lg p-6">
-          <h2 className="text-xl font-bold text-center ">3 ngày được chọn nhiều nhất</h2>
-          <ul className="list-disc pl-5">
+      <div className="flex flex-row lg:justify-start justify-between lg:w-[50%] w-[100%]">
+        <div className="lg:ml-[50px] mb-20 min-h-[200px] w-[48%] bg-white bg-red-000 rounded-2xl shadow-lg lg:p-6 p-[15px]">
+          <h2 className="md:text-xl sm:text-[16px] text-[12px] font-bold text-center mb-[10px]">3 ngày oke nhất</h2>
+          <ul className="list-disc sm:pl-5 pl-[10px]">
             {getTopThreeDates().length === 0 ? (
-              <li>Chưa có ai tham gia</li>
+              <li className="sm:text-[18px] text-[12px]">Chưa có ai tham gia</li>
             ) : (
               getTopThreeDates().map(([date, count]) => (
                 <li key={date}>
@@ -344,12 +344,12 @@ const App = () => {
         >
           Clear All Choices
         </button> */}
+        <div className="flex flex-col lg:ml-[50px] bg-red-000 mb-20 min-h-[200px] w-[48%] bg-white bg-red-000 rounded-2xl shadow-lg lg:p-6 p-[15px]">
+          {renderChosenPeopleList()}
+        </div>
       </div>
 
 
-      <div className="flex flex-col ml-[50px] bg-red-000 mb-20 min-h-[200px] w-auto bg-white bg-red-000 rounded-2xl shadow-lg p-6">
-        {renderChosenPeopleList()}
-      </div>
     </div>
   );
 };
