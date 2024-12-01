@@ -204,7 +204,7 @@ const App = () => {
 
       {isDialogOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-70 pb-20 flex items-center justify-center">
-          <div 
+          <div
             ref={dialogRef}
             className="bg-white p-8 rounded-lg max-w-md w-full">
             <h2 className="text-2xl font-bold mb-4 text-center">Chắc chắn đi không vậy mẹ</h2>
@@ -278,47 +278,48 @@ const App = () => {
             </defs>
           </svg>
 
-          {/* highest wave */}
-          <div className="">
-          <Wave
-            fill="url(#seaGradient1)"
-            paused={false}
-            style={{ display: 'flex', position: 'absolute', bottom: 10, left: 0, right: 0 }}
-            options={{
-              height: 2,
-              amplitude: 50,
-              speed: 0.15,
-              points: 3
-            }}
-          />
-
-          {/* second highest wave */}
-          <Wave
-            fill="url(#seaGradient2)"
-            paused={false}
-            style={{ display: 'flex', position: 'absolute', bottom: 0, left: 0, right: 0 }} // Slightly higher
-            options={{
-              height: 45,
-              amplitude: 40,
-              speed: 0.2,
-              points: 3
-            }}
-          />
-
-          {/* third highest wave */}
-          <Wave
-            fill="url(#seaGradient3)"
-            paused={false}
-            style={{ display: 'flex', position: 'absolute', bottom: 0, left: 0, right: 0 }} // Slightly higher
-            options={{
-              height: 80,
-              amplitude: 30,
-              speed: 0.25,
-              points: 3
-            }}
-          />
-          </div>
           
+          <div className="">
+            {/* highest wave */}
+            {/* <Wave
+              fill="url(#seaGradient1)"
+              paused={false}
+              style={{ display: 'flex', position: 'absolute', bottom: 10, left: 0, right: 0 }}
+              options={{
+                height: 2,
+                amplitude: 50,
+                speed: 0.15,
+                points: 3
+              }}
+            /> */}
+
+            {/* second highest wave */}
+            {/* <Wave
+              fill="url(#seaGradient2)"
+              paused={false}
+              style={{ display: 'flex', position: 'absolute', bottom: 0, left: 0, right: 0 }} // Slightly higher
+              options={{
+                height: 45,
+                amplitude: 40,
+                speed: 0.2,
+                points: 3
+              }}
+            /> */}
+
+            {/* third highest wave */}
+            {/* <Wave
+              fill="url(#seaGradient3)"
+              paused={false}
+              style={{ display: 'flex', position: 'absolute', bottom: 0, left: 0, right: 0 }} // Slightly higher
+              options={{
+                height: 80,
+                amplitude: 30,
+                speed: 0.25,
+                points: 3
+              }}
+            /> */}
+          </div>
+
         </div>
       )}
 
