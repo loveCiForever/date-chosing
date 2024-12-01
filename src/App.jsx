@@ -2,6 +2,29 @@ import React, { useState, useEffect, useRef } from "react";
 import { format } from "date-fns";
 import Wave from 'react-wavify';
 
+
+// Firebase Config
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { getDatabase, ref, set, update, get, child } from "firebase/database";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCwczS0581iWd_ZM-mhjPH_8Hn2aTAW_m8",
+  authDomain: "vungtautrip-9bc2e.firebaseapp.com",
+  databaseURL: "https://vungtautrip-9bc2e-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "vungtautrip-9bc2e",
+  storageBucket: "vungtautrip-9bc2e.firebasestorage.app",
+  messagingSenderId: "668112203929",
+  appId: "1:668112203929:web:74a4471481c14df3c54808",
+  measurementId: "G-Y6MHXM3D93"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const database = getDatabase(app);
+// End Firebase Config
+
 const App = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -30,10 +53,24 @@ const App = () => {
   }, [isDialogOpen]);
 
   useEffect(() => {
-    const storedChoices = localStorage.getItem("tripChoices");
-    if (storedChoices) {
-      setDateChoices(JSON.parse(storedChoices));
-    }
+    // Firebase
+    const fetchData = async () => {
+      const dbRef = ref(database, '/');
+      try {
+        const snapshot = await get(dbRef);
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const formattedChoices = Object.entries(data).map(([date, value]) => ({
+            date,
+            people: value.people || []
+          }));
+          setDateChoices(formattedChoices);
+        }
+      } catch (error) {
+        console.error("Error fetching data from Firebase:", error);
+      }
+    };
+    fetchData();
   }, []);
 
   const handleDateSelect = (date) => {
@@ -56,10 +93,36 @@ const App = () => {
       }
 
       setDateChoices(updatedChoices);
-      localStorage.setItem("tripChoices", JSON.stringify(updatedChoices));
       setConfirmedDate(selectedDate);
       setIsDialogOpen(false);
       setName("");
+
+      // Firebase
+      function writeUserData() {
+        const db = getDatabase();
+        const dateRef = ref(db, `${dateKey}`);
+        get(dateRef)
+          .then((snapshot) => {
+            // If exist -> Add people to this day
+            if (snapshot.exists()) {
+              const existingData = snapshot.val();
+              // Push new user into the existing array of assignned user
+              const updatedPeople = existingData.people ? [...existingData.people, name] : [name];
+              update(dateRef, { people: updatedPeople })
+            }
+            // If not exist -> Create new object
+            else {
+              set(dateRef, {
+                people: [name]
+              })
+            }
+          })
+          .catch((error) => {
+            console.error("Error reading data from Firebase: ", error);
+          });
+      }
+
+      writeUserData();
     }
   };
 
@@ -162,7 +225,7 @@ const App = () => {
 
   const getTopThreeDates = () => {
     const dateCount = {};
-
+    
     dateChoices.forEach(choice => {
       dateCount[choice.date] = choice.people.length;
     });
