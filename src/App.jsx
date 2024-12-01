@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { format } from "date-fns";
 import Wave from 'react-wavify';
+import { getFirestore, collection, addDoc, getDocs } from 'firebase/firestore';
 
 const App = () => {
   const [selectedDate, setSelectedDate] = useState(null);
