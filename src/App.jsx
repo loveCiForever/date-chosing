@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
+import Swal from 'sweetalert2';
 import { format } from "date-fns";
 import Wave from 'react-wavify';
-
 
 // Firebase Config
 import { initializeApp } from "firebase/app";
@@ -33,6 +33,26 @@ const App = () => {
   const [dateChoices, setDateChoices] = useState([]);
   const [hoveredDate, setHoveredDate] = useState(null);
   const dialogRef = useRef(null);
+
+  useEffect(() => {
+    Swal.fire({
+      title: "Chọn ngày mọi người rảnh để đi Vũng Tàu bên lịch kia nhóe!",
+      showClass: {
+        popup: `
+          animate__animated
+          animate__fadeInUp
+          animate__faster
+        `
+      },
+      hideClass: {
+        popup: `
+          animate__animated
+          animate__fadeOutDown
+          animate__faster
+        `
+      }
+    });
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -238,7 +258,7 @@ const App = () => {
 
   return (
     <div className="flex-row items-center justify-center block min-h-screen p-3 bg-pink-50 lg:flex">
-      <div className="bg-white p-8 rounded-2xl shadow-lg lg:max-w-[30%] max-w-[100%] w-full lg:mb-20 mb-5">
+      <div className="bg-white p-8 rounded-2xl shadow-lg lg:max-w-[40%] max-w-[100%] w-full lg:mb-20 mb-5">
         <h1 className="lg:text-3xl md:text-5xl sm:text-4xl text-[24px] font-bold mb-2 text-center text-gray-800">Vũng Tàu Tháng 12 - Here we go</h1>
         <p className="lg:text-lg md:text-2xl sm:text-xl text-[14px] text-gray-500 sm:mb-6 mb-[10px] text-center">Lựa ngày các bé rảnh đi nhé </p>
         <table className="w-full border-collapse bg-blue-000">
