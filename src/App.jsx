@@ -93,7 +93,7 @@ const App = () => {
             {day}
           </button>
           {hoveredDate && hoveredDate.getTime() === date.getTime() && (
-            <div className="absolute bg-white border rounded shadow-lg p-2 mt-1">
+            <div className="absolute p-2 mt-1 bg-white border rounded shadow-lg">
               <h4 className="font-semibold"></h4>
               <ul>
                 {getPeopleForDate(hoveredDate).length === 0 ? (
@@ -174,9 +174,9 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-pink-50 lg:flex flex-row block items-center justify-center p-3">
+    <div className="flex-row items-center justify-center block min-h-screen p-3 bg-pink-50 lg:flex">
       <div className="bg-white p-8 rounded-2xl shadow-lg lg:max-w-[30%] max-w-[100%] w-full lg:mb-20 mb-5">
-        <h1 className="lg:text-3xl md:text-5xl sm:text-4xl text-[24px] font-bold mb-2 text-center text-gray-800">Vũng Tàu - Here we go</h1>
+        <h1 className="lg:text-3xl md:text-5xl sm:text-4xl text-[24px] font-bold mb-2 text-center text-gray-800">Vũng Tàu Tháng 12 - Here we go</h1>
         <p className="lg:text-lg md:text-2xl sm:text-xl text-[14px] text-gray-500 sm:mb-6 mb-[10px] text-center">Lựa ngày các bé rảnh đi nhé </p>
         <table className="w-full border-collapse bg-blue-000">
 
@@ -203,11 +203,11 @@ const App = () => {
       </div>
 
       {isDialogOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 pb-20 flex items-center justify-center">
+        <div className="fixed inset-0 flex items-center justify-center pb-20 bg-black bg-opacity-70">
           <div
             ref={dialogRef}
-            className="bg-white p-8 rounded-lg max-w-md w-full">
-            <h2 className="text-2xl font-bold mb-4 text-center">Chắc chắn đi không vậy mẹ</h2>
+            className="w-full max-w-md p-8 bg-white rounded-lg">
+            <h2 className="mb-4 text-2xl font-bold text-center">Chắc chắn đi không vậy mẹ</h2>
             <p className="mb-10 text-sm text-center">
               {selectedDate
                 ? `Bạn đã chọn ngày: ${format(selectedDate, "MMMM d, yyyy")}`
@@ -216,8 +216,8 @@ const App = () => {
             {selectedDate && (
               <>
                 <div className="mb-4">
-                  <h3 className="font-semibold mb-2">Có những ai chọn ngày này vậy ha</h3>
-                  <div className="min-h-20 overflow-y-auto border p-2 rounded">
+                  <h3 className="mb-2 font-semibold">Có những ai chọn ngày này vậy ha</h3>
+                  <div className="p-2 overflow-y-auto border rounded min-h-20">
                     <ul>
                       {getPeopleForDate(selectedDate).map((person, index) => (
                         <li key={index}>{person}</li>
@@ -228,21 +228,21 @@ const App = () => {
                 <div className="mb-4">
                   <label
                     htmlFor="name"
-                    className="block mb-2 mt-6">Mày không phải cha</label>
+                    className="block mt-6 mb-2">Mày không phải cha</label>
                   <input
                     id="name"
                     type="text"
                     placeholder="Nên điền tên đầy đủ nhé "
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full p-2 border rounded text-sm"
+                    className="w-full p-2 text-sm border rounded"
                   />
                 </div>
                 <div className="flex justify-end">
                   <button
                     onClick={handleConfirm}
                     disabled={!name}
-                    className="px-4 py-2 bg-pink-400 text-white rounded hover:bg-green-600 disabled:bg-gray-300"
+                    className="px-4 py-2 text-white bg-pink-400 rounded hover:bg-green-600 disabled:bg-gray-300"
                   >
                     Xác nhận không đi làm tró
                   </button>
@@ -340,7 +340,7 @@ const App = () => {
         </div>
         {/* <button
           onClick={handleClearStorage}
-          className="px-4 py-2 bg-red-300 text-white rounded hover:bg-red-500"
+          className="px-4 py-2 text-white bg-red-300 rounded hover:bg-red-500"
         >
           Clear All Choices
         </button> */}
