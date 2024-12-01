@@ -8,6 +8,7 @@ const App = () => {
   const [confirmedDate, setConfirmedDate] = useState(null);
   const [name, setName] = useState("");
   const [dateChoices, setDateChoices] = useState([]);
+  const [hoveredDate, setHoveredDate] = useState(null);
 
   useEffect(() => {
     const storedChoices = localStorage.getItem("tripChoices");
@@ -66,10 +67,26 @@ const App = () => {
         <td key={day} className="p-2 text-center">
           <button
             onClick={() => handleDateSelect(date)}
+            onMouseEnter={() => setHoveredDate(date)}
+            onMouseLeave={() => setHoveredDate(null)}
             className="w-full h-full py-[6px] bg-red-000 rounded-lg hover:bg-gray-300 hover"
           >
             {day}
           </button>
+          {hoveredDate && hoveredDate.getTime() === date.getTime() && (
+            <div className="absolute bg-white border rounded shadow-lg p-2 mt-1">
+              <h4 className="font-semibold"></h4>
+              <ul>
+                {getPeopleForDate(hoveredDate).length === 0 ? (
+                  <li>Chưa ai chọn cả</li>
+                ) : (
+                  getPeopleForDate(hoveredDate).map((person, index) => (
+                    <li key={index}>{person}</li>
+                  ))
+                )}
+              </ul>
+            </div>
+          )}
         </td>
       );
     }
@@ -87,6 +104,42 @@ const App = () => {
 
     return weeks;
   };
+
+  const renderChosenPeopleList = () => {
+    const peopleMap = {};
+
+    // Create a map of people to their chosen dates
+    dateChoices.forEach(choice => {
+      choice.people.forEach(person => {
+        if (!peopleMap[person]) {
+          peopleMap[person] = [];
+        }
+        peopleMap[person].push(choice.date);
+      });
+    });
+
+    return (
+      <div className="my-6 ">
+        <h2 className="text-xl font-bold mb-2">Nững người bạn lẹ tay</h2>
+        <ul className="list-disc pl-5">
+          {Object.entries(peopleMap).length === 0 ? (
+            <li>Chưa có ai tham gia</li>
+          ) : (
+            Object.entries(peopleMap).map(([person, dates]) => (
+              <li key={person}>
+                {person}: {dates.join(", ")}
+              </li>
+            ))
+          )}
+        </ul>
+      </div>
+    );
+  };
+
+  const handleClearStorage = () => {
+    localStorage.removeItem("tripChoices");
+    setDateChoices([]);
+  }
 
   return (
     <div className="min-h-screen bg-pink-50 flex items-center justify-center p-4">
@@ -210,14 +263,14 @@ const App = () => {
             paused={false}
             style={{ display: 'flex', position: 'absolute', bottom: 0, left: 0, right: 0 }} // Slightly higher
             options={{
-              height: 45, 
+              height: 45,
               amplitude: 40,
               speed: 0.2,
               points: 3
             }}
           />
 
-          {/* third highest wave */}                                                             
+          {/* third highest wave */}
           <Wave
             fill="url(#seaGradient3)"
             paused={false}
@@ -232,10 +285,17 @@ const App = () => {
         </div>
       )}
 
-
+      <div className="flex flex-col ml-[50px] bg-red-000 mb-20">
+        {renderChosenPeopleList()}
+        <button
+          onClick={handleClearStorage}
+          className="px-4 py-2 bg-red-300 text-white rounded hover:bg-red-500"
+        >
+          Clear All Choices
+        </button>
+      </div>
 
     </div>
-
   );
 };
 
