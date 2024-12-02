@@ -34,25 +34,25 @@ const App = () => {
   const [hoveredDate, setHoveredDate] = useState(null);
   const dialogRef = useRef(null);
 
-  useEffect(() => {
-    Swal.fire({
-      title: "Chọn ngày mọi người rảnh để đi Vũng Tàu bên lịch kia nhóe!",
-      showClass: {
-        popup: `
-          animate__animated
-          animate__fadeInUp
-          animate__faster
-        `
-      },
-      hideClass: {
-        popup: `
-          animate__animated
-          animate__fadeOutDown
-          animate__faster
-        `
-      }
-    });
-  }, [])
+  // useEffect(() => {
+  //   Swal.fire({
+  //     title: "Chọn ngày mọi người rảnh để đi Vũng Tàu bên lịch kia nhóe!",
+  //     showClass: {
+  //       popup: `
+  //         animate__animated
+  //         animate__fadeInUp
+  //         animate__faster
+  //       `
+  //     },
+  //     hideClass: {
+  //       popup: `
+  //         animate__animated
+  //         animate__fadeOutDown
+  //         animate__faster
+  //       `
+  //     }
+  //   });
+  // }, [])
 
   useEffect(() => {
     const handleClickOutside = (event) => {
