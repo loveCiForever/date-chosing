@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import Swal from 'sweetalert2';
 import { format } from "date-fns";
 import Wave from 'react-wavify';
-import { getFirestore, collection, addDoc, getDocs } from 'firebase/firestore';
 
 // Firebase Config
 import { initializeApp } from "firebase/app";
@@ -35,25 +34,25 @@ const App = () => {
   const [hoveredDate, setHoveredDate] = useState(null);
   const dialogRef = useRef(null);
 
-  // useEffect(() => {
-  //   Swal.fire({
-  //     title: "Chọn ngày mọi người rảnh để đi Vũng Tàu bên lịch kia nhóe!",
-  //     showClass: {
-  //       popup: `
-  //         animate__animated
-  //         animate__fadeInUp
-  //         animate__faster
-  //       `
-  //     },
-  //     hideClass: {
-  //       popup: `
-  //         animate__animated
-  //         animate__fadeOutDown
-  //         animate__faster
-  //       `
-  //     }
-  //   });
-  // }, [])
+  useEffect(() => {
+    Swal.fire({
+      title: "Chọn ngày mọi người rảnh để đi Vũng Tàu bên lịch kia nhóe!",
+      showClass: {
+        popup: `
+          animate__animated
+          animate__fadeInUp
+          animate__faster
+        `
+      },
+      hideClass: {
+        popup: `
+          animate__animated
+          animate__fadeOutDown
+          animate__faster
+        `
+      }
+    });
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -127,21 +126,18 @@ const App = () => {
             // If exist -> Add people to this day
             if (snapshot.exists()) {
               const existingData = snapshot.val().people;
-
-              // convert to lowercase
-              const lowerCaseName = name.toLowerCase();
-              // convert to lowercase
-
-              const userExists = existingData.some(user => user.toLowerCase() === lowerCaseName);
-
               // Check if that user exist
-              if (userExists) {
-                Swal.fire({
-                  icon: "error",
-                  title: "Oops...",
-                  text: "Bạn đã chọn ngày này trước đó",
-                })
-              }
+              existingData.forEach((user) => {
+                if (name == user)
+                {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Đăng ký rồi mà đăng ký lại d fen",
+                  });
+                  return;
+                }
+              })
               const updatedPeople = existingData.people ? [...existingData.people, name] : [name];
               update(dateRef, { people: updatedPeople })
             }
@@ -243,8 +239,8 @@ const App = () => {
             <li className="sm:text-[18px] text-[12px]">Chưa có ai tham gia</li>
           ) : (
             Object.entries(peopleMap).map(([person, dates]) => (
-              <li key={person}>
-                {person}: {dates.join(", ")}
+              <li key={person} className="sm:text-[18px] text-[12px]">
+                <b>{person}</b>: {dates.join(", ")}
               </li>
             ))
           )}
@@ -260,7 +256,7 @@ const App = () => {
 
   const getTopThreeDates = () => {
     const dateCount = {};
-
+    
     dateChoices.forEach(choice => {
       dateCount[choice.date] = choice.people.length;
     });
@@ -272,122 +268,114 @@ const App = () => {
   };
 
   return (
-    <div className="flex-col h-auto bg-pink-50">
-      <div className="flex-row items-center justify-center block min-h-screen p-5 lg:flex">
-        <div className="bg-white p-8 rounded-2xl shadow-lg lg:max-w-[40%] max-w-[100%] w-full lg:mb-20 my-5">
-          <h1 className="lg:text-3xl md:text-5xl sm:text-4xl text-[24px] font-bold mb-2 text-center text-gray-800">Vũng Tàu Tháng 12 - Here we go</h1>
-          <p className="lg:text-lg md:text-2xl sm:text-xl text-[14px] text-gray-500 sm:mb-6 mb-[10px] text-center">Lựa ngày các bé rảnh đi nhé </p>
-          <table className="w-full border-collapse bg-blue-000">
+    <div className="flex-row items-center justify-center block min-h-screen p-3 bg-pink-50 lg:flex">
+      <div className="bg-white p-8 rounded-2xl shadow-lg lg:max-w-[40%] max-w-[100%] w-full lg:mb-20 mb-5">
+        <h1 className="lg:text-3xl md:text-5xl sm:text-4xl text-[24px] font-bold mb-2 text-center text-gray-800">Vũng Tàu Tháng 12 - Here we go</h1>
+        <p className="lg:text-lg md:text-2xl sm:text-xl text-[14px] text-gray-500 sm:mb-6 mb-[10px] text-center">Lựa ngày các bé rảnh đi nhé </p>
+        <table className="w-full border-collapse bg-blue-000">
 
-            {/* Day */}
-            <thead className="bg-red-000">
-              <tr>
-                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                  <th key={day} className="sm:text-[16px] text-[14px] py-2 flex-grow">{day}</th>
-                ))}
-              </tr>
-            </thead>
+          {/* Day */}
+          <thead className="bg-red-000">
+            <tr>
+              {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+                <th key={day} className="sm:text-[16px] text-[14px] py-2 flex-grow">{day}</th>
+              ))}
+            </tr>
+          </thead>
 
-            {/* Date */}
-            <tbody>{generateCalendar()}</tbody>
+          {/* Date */}
+          <tbody>{generateCalendar()}</tbody>
 
-          </table>
-          {confirmedDate && (
-            <div className="mt-4 text-center">
-              <p className="text-green-600">
-                Bạn đã xác nhận lựa chọn: {format(confirmedDate, "MMMM d, yyyy")}
-              </p>
-            </div>
-          )}
-        </div>
-
-        {isDialogOpen && (
-          <div className="fixed inset-0 flex items-center justify-center w-full pb-20 bg-black bg-opacity-70">
-            <div
-              ref={dialogRef}
-              className="w-full max-w-md p-8 bg-white rounded-lg">
-              <h2 className="mb-4 text-2xl font-bold text-center">Chắc chắn đi không vậy mẹ</h2>
-              <p className="mb-10 text-sm text-center">
-                {selectedDate
-                  ? `Bạn đã chọn ngày: ${format(selectedDate, "MMMM d, yyyy")}`
-                  : "Lựa 1 ngày đi nhá"}
-              </p>
-              {selectedDate && (
-                <div className="w-full">
-                  <div className="mb-4">
-                    <h3 className="mb-2 font-semibold">Những người đã chọn ngày này</h3>
-                    <div className="p-2 overflow-y-auto border rounded min-h-20">
-                      <ul>
-                        {getPeopleForDate(selectedDate).map((person, index) => (
-                          <li 
-                            key={index}
-                            //className="text-xl text-red-300"
-                          >
-                            {person}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                  <div className="mb-4">
-                    <label
-                      htmlFor="name"
-                      className="block mt-6 mb-0 font-semibold">Pháp danh
-                    </label>
-                    <h2 className="mb-2 text-xs">(Ví dụ: Nguyễn Quang Huy)</h2>
-                    <input
-                      id="name"
-                      type="text"
-                      placeholder="Nên điền đầy đủ họ và tên nhé"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full p-2 text-sm border rounded"
-                    />
-                  </div>
-                  <div className="flex justify-end">
-                    <button
-                      onClick={handleConfirm}
-                      disabled={!name}
-                      className="px-4 py-2 text-white bg-pink-400 rounded hover:bg-green-600 disabled:bg-gray-300"
-                    >
-                      Xác nhận không đi làm tró
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+        </table>
+        {confirmedDate && (
+          <div className="mt-4 text-center">
+            <p className="text-green-600">
+              You've confirmed: {format(confirmedDate, "MMMM d, yyyy")}
+            </p>
           </div>
         )}
+      </div>
 
-        {!isDialogOpen && (
+      {isDialogOpen && (
+        <div className="fixed inset-0 flex items-center justify-center pb-20 bg-black bg-opacity-70">
+          <div
+            ref={dialogRef}
+            className="w-full max-w-md p-8 bg-white rounded-lg">
+            <h2 className="mb-4 text-2xl font-bold text-center">Chắc chắn đi không vậy mẹ</h2>
+            <p className="mb-10 text-sm text-center">
+              {selectedDate
+                ? `Bạn đã chọn ngày: ${format(selectedDate, "MMMM d, yyyy")}`
+                : "Lựa 1 ngày đi nhá"}
+            </p>
+            {selectedDate && (
+              <>
+                <div className="mb-4">
+                  <h3 className="mb-2 font-semibold">Có những ai chọn ngày này vậy ha</h3>
+                  <div className="p-2 overflow-y-auto border rounded min-h-20">
+                    <ul>
+                      {getPeopleForDate(selectedDate).map((person, index) => (
+                        <li key={index}>{person}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                <div className="mb-4">
+                  <label
+                    htmlFor="name"
+                    className="block mt-6 mb-2">Mày không phải cha</label>
+                  <input
+                    id="name"
+                    type="text"
+                    placeholder="Nên điền tên đầy đủ nhé "
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full p-2 text-sm border rounded"
+                  />
+                </div>
+                <div className="flex justify-end">
+                  <button
+                    onClick={handleConfirm}
+                    disabled={!name}
+                    className="px-4 py-2 text-white bg-pink-400 rounded hover:bg-green-600 disabled:bg-gray-300"
+                  >
+                    Xác nhận không đi làm tró
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {!isDialogOpen && (
+        <div className="">
+          <svg width="0" height="0">
+            <defs>
+              <linearGradient id="seaGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                {/* mint blue */}
+                <stop offset="0%" style={{ stopColor: '#5fc1ef', stopOpacity: 1 }} />
+                {/* light blue */}
+                <stop offset="100%" style={{ stopColor: '#40a6d7', stopOpacity: 1 }} />
+              </linearGradient>
+              <linearGradient id="seaGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                {/* light blue */}
+                <stop offset="0%" style={{ stopColor: '#ecf2f5', stopOpacity: 1 }} />
+                {/* dark blue */}
+                <stop offset="100%" style={{ stopColor: '#C0DCE7', stopOpacity: 1 }} />
+              </linearGradient>
+              <linearGradient id="seaGradient3" x1="0%" y1="0%" x2="100%" y2="100%">
+                {/* dark blue */}
+                <stop offset="0%" style={{ stopColor: '#4682b4', stopOpacity: 1 }} />
+                {/* near cyan */}
+                <stop offset="100%" style={{ stopColor: '#5f9ea0', stopOpacity: 1 }} />
+              </linearGradient>
+            </defs>
+          </svg>
+
+
           <div className="">
-            <svg width="0" height="0">
-              <defs>
-                <linearGradient id="seaGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
-                  {/* mint blue */}
-                  <stop offset="0%" style={{ stopColor: '#5fc1ef', stopOpacity: 1 }} />
-                  {/* light blue */}
-                  <stop offset="100%" style={{ stopColor: '#40a6d7', stopOpacity: 1 }} />
-                </linearGradient>
-                <linearGradient id="seaGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-                  {/* light blue */}
-                  <stop offset="0%" style={{ stopColor: '#ecf2f5', stopOpacity: 1 }} />
-                  {/* dark blue */}
-                  <stop offset="100%" style={{ stopColor: '#C0DCE7', stopOpacity: 1 }} />
-                </linearGradient>
-                <linearGradient id="seaGradient3" x1="0%" y1="0%" x2="100%" y2="100%">
-                  {/* dark blue */}
-                  <stop offset="0%" style={{ stopColor: '#4682b4', stopOpacity: 1 }} />
-                  {/* near cyan */}
-                  <stop offset="100%" style={{ stopColor: '#5f9ea0', stopOpacity: 1 }} />
-                </linearGradient>
-              </defs>
-            </svg>
-
-
-            <div className="">
-              {/* highest wave */}
-              {/* <Wave
+            {/* highest wave */}
+            {/* <Wave
               fill="url(#seaGradient1)"
               paused={false}
               style={{ display: 'flex', position: 'absolute', bottom: 10, left: 0, right: 0 }}
@@ -399,8 +387,8 @@ const App = () => {
               }}
             /> */}
 
-              {/* second highest wave */}
-              {/* <Wave
+            {/* second highest wave */}
+            {/* <Wave
               fill="url(#seaGradient2)"
               paused={false}
               style={{ display: 'flex', position: 'absolute', bottom: 0, left: 0, right: 0 }} // Slightly higher
@@ -412,8 +400,8 @@ const App = () => {
               }}
             /> */}
 
-              {/* third highest wave */}
-              {/* <Wave
+            {/* third highest wave */}
+            {/* <Wave
               fill="url(#seaGradient3)"
               paused={false}
               style={{ display: 'flex', position: 'absolute', bottom: 0, left: 0, right: 0 }} // Slightly higher
@@ -424,45 +412,39 @@ const App = () => {
                 points: 3
               }}
             /> */}
-            </div>
-
           </div>
-        )}
 
-        <div className="flex flex-row lg:justify-start justify-between lg:w-[50%] w-[100%]">
-          <div className="lg:ml-[50px] mb-20 min-h-[200px] w-[48%] bg-white bg-red-000 rounded-2xl shadow-lg lg:p-6 p-[15px]">
-            <h2 className="md:text-xl sm:text-[16px] text-[12px] font-bold text-center mb-[10px]">3 ngày oke nhất</h2>
-            <ul className="list-disc sm:pl-5 pl-[10px]">
-              {getTopThreeDates().length === 0 ? (
-                <li className="sm:text-[18px] text-[12px]">Chưa có ai tham gia</li>
-              ) : (
-                getTopThreeDates().map(([date, count]) => (
-                  <li 
-                    key={date}
-                    className=""
-                  >
-                    {date}: {count} người đã chọn
-                  </li>
-                ))
-              )}
-            </ul>
-          </div>
-          {/* <button
+        </div>
+      )}
+
+      <div className="flex flex-row lg:justify-start justify-between lg:w-[50%] w-[100%]">
+        <div className="lg:ml-[50px] mb-20 min-h-[200px] w-[48%] bg-white bg-red-000 rounded-2xl shadow-lg lg:p-6 p-[15px]">
+          <h2 className="md:text-xl sm:text-[16px] text-[12px] font-bold text-center mb-[10px]">3 ngày oke nhất</h2>
+          <ul className="list-disc sm:pl-5 pl-[10px]">
+            {getTopThreeDates().length === 0 ? (
+              <li className="sm:text-[18px] text-[12px]">Chưa có ai tham gia</li>
+            ) : (
+              getTopThreeDates().map(([date, count]) => (
+                <li key={date} className="sm:text-[18px] text-[12px]">
+                  <b>{date}</b>: {count} người đã chọn
+                </li>
+              ))
+            )}
+          </ul>
+        </div>
+        {/* <button
           onClick={handleClearStorage}
           className="px-4 py-2 text-white bg-red-300 rounded hover:bg-red-500"
         >
           Clear All Choices
         </button> */}
-          <div className="flex flex-col lg:ml-[50px] bg-red-000 mb-20 min-h-[200px] w-[48%] bg-white bg-red-000 rounded-2xl shadow-lg lg:p-6 p-[15px]">
-            {renderChosenPeopleList()}
-          </div>
+        <div className="flex flex-col lg:ml-[50px] bg-red-000 mb-20 min-h-[200px] w-[48%] bg-white bg-red-000 rounded-2xl shadow-lg lg:p-6 p-[15px]">
+          {renderChosenPeopleList()}
         </div>
       </div>
-      <h1 className="text-sm font-bold tracking-wider text-center"> Một sản phẩm của DOM Corp</h1>
+
+
     </div>
-
-
-    
   );
 };
 
