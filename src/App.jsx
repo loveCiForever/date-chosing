@@ -239,8 +239,8 @@ const App = () => {
             <li className="sm:text-[18px] text-[12px]">Chưa có ai tham gia</li>
           ) : (
             Object.entries(peopleMap).map(([person, dates]) => (
-              <li key={person}>
-                {person}: {dates.join(", ")}
+              <li key={person} className="sm:text-[18px] text-[12px]">
+                <b>{person}</b>: {dates.join(", ")}
               </li>
             ))
           )}
@@ -425,8 +425,8 @@ const App = () => {
               <li className="sm:text-[18px] text-[12px]">Chưa có ai tham gia</li>
             ) : (
               getTopThreeDates().map(([date, count]) => (
-                <li key={date}>
-                  {date}: {count} người đã chọn
+                <li key={date} className="sm:text-[18px] text-[12px]">
+                  <b>{date}</b>: {count} người đã chọn
                 </li>
               ))
             )}
