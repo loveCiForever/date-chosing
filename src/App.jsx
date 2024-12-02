@@ -232,7 +232,7 @@ const App = () => {
 
     return (
       <div className="mb-0">
-        <h2 className="md:text-xl sm:text-[16px] text-[10px] font-bold mb-[10px] text-center">Những bạn sẽ tham gia</h2>
+        <h2 className="md:text-[18px] sm:text-[16px] text-[12px] font-bold mb-[10px] text-center">Những bạn sẽ tham gia</h2>
         <ul className="list-container list-disc pl-5 ml-[-10px] max-h-[200px] overflow-y-auto">
           {Object.entries(peopleMap).length === 0 ? (
             <li className="sm:text-[18px] text-[12px]">Chưa có ai tham gia</li>
@@ -419,9 +419,9 @@ const App = () => {
         )}
 
         <div className="flex flex-row lg:justify-start justify-between lg:w-[50%] w-[100%]">
-          <div className="lg:ml-[50px] mb-20 max-h-[476px] min-h-[200px] overflow-y-auto w-[48%] bg-white bg-red-000 rounded-2xl shadow-lg lg:p-2 lg:pt-6 pt-4">
-            <h2 className="md:text-xl sm:text-[16px] text-[12px] font-bold text-center mb-[10px]">3 ngày được chọn nhiều nhất</h2>
-            <ul className="flex-col sm:pl-0 pl-[10px] mt-4">
+          <div className="lg:ml-[50px] mb-20 max-h-[476px] min-h-[200px] overflow-y-auto w-[40%] bg-white bg-red-000 rounded-2xl shadow-lg lg:p-2 lg:pt-6 pt-4">
+            <h2 className="md:text-[18px] sm:text-[16px] text-[12px] font-bold text-center mb-[10px]">3 ngày được chọn nhiều nhất</h2>
+            <ul className="flex-col sm:pl-0 pl-[5px] mt-4">
               {getTopThreeDates().length === 0 ? (
                 <li className="sm:text-[18px] text-[12px]">Chưa có ai tham gia</li>
               ) : (
@@ -441,9 +441,8 @@ const App = () => {
                       colorClass = ""; 
                   }
                   return (
-                    <li key={date} className="sm:text-[16px] text-[12px] mt-2 flex sm:flex-row flex-col sm:gap-[10px] gap-[5px] justify-center items-center">
-                      <b className={`px-3 py-1 ${colorClass} rounded-xl`}>{date}</b> 
-                      <div>{count} người đã chọn</div>
+                    <li key={date} className="sm:text-[16px] text-[12px] mt-2 text-center">
+                      <b className={`sm:px-3 px-[8px] py-1 ${colorClass} rounded-xl`}>{date}</b> {count}
                     </li>
                   );
                 })
@@ -456,7 +455,7 @@ const App = () => {
           >
             Clear All Choices
           </button> */}
-          <div className="flex flex-col lg:ml-[50px] bg-red-000 mb-20 min-h-[200px] w-[48%] bg-white bg-red-000 rounded-2xl shadow-lg lg:p-6 p-[15px]">
+          <div className="flex flex-col lg:ml-[50px] bg-red-000 mb-20 min-h-[200px] w-[58%] bg-white bg-red-000 rounded-2xl shadow-lg lg:p-6 p-[15px]">
             {renderChosenPeopleList()}
           </div>
         </div>
