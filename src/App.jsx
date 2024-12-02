@@ -75,7 +75,7 @@ const App = () => {
   useEffect(() => {
     // Firebase
     const fetchData = async () => {
-      const dbRef = ref(database, '/');
+      const dbRef = ref(database, 'dates/');
       try {
         const snapshot = await get(dbRef);
         if (snapshot.exists()) {
@@ -120,7 +120,7 @@ const App = () => {
       // Firebase
       function writeUserData() {
         const db = getDatabase();
-        const dateRef = ref(db, `${dateKey}`);
+        const dateRef = ref(db, `dates/${dateKey}`);
         get(dateRef)
           .then((snapshot) => {
             // If exist -> Add people to this day
@@ -232,8 +232,8 @@ const App = () => {
 
     return (
       <div className="mb-0">
-        <h2 className="md:text-xl sm:text-[16px] text-[12px] font-bold mb-[10px] text-center">Những bạn sẽ tham gia</h2>
-        <ul className="list-disc sm:pl-5 pl-[10px]">
+        <h2 className="md:text-xl sm:text-[16px] text-[10px] font-bold mb-[10px] text-center">Những bạn sẽ tham gia</h2>
+        <ul className="list-container list-disc pl-5 ml-[-10px] max-h-[200px] overflow-y-auto">
           {Object.entries(peopleMap).length === 0 ? (
             <li className="sm:text-[18px] text-[12px]">Chưa có ai tham gia</li>
           ) : (
@@ -419,9 +419,9 @@ const App = () => {
         )}
 
         <div className="flex flex-row lg:justify-start justify-between lg:w-[50%] w-[100%]">
-          <div className="lg:ml-[50px] mb-20 min-h-[200px] w-[48%] bg-white bg-red-000 rounded-2xl shadow-lg lg:p-2 lg:pt-6 pt-4">
+          <div className="lg:ml-[50px] mb-20 max-h-[476px] min-h-[200px] overflow-y-auto w-[48%] bg-white bg-red-000 rounded-2xl shadow-lg lg:p-2 lg:pt-6 pt-4">
             <h2 className="md:text-xl sm:text-[16px] text-[12px] font-bold text-center mb-[10px]">3 ngày được chọn nhiều nhất</h2>
-            <ul className="flex-col list-none sm:pl-0 pl-[0px] mt-4">
+            <ul className="flex-col sm:pl-0 pl-[10px] mt-4">
               {getTopThreeDates().length === 0 ? (
                 <li className="sm:text-[18px] text-[12px]">Chưa có ai tham gia</li>
               ) : (
@@ -441,8 +441,9 @@ const App = () => {
                       colorClass = ""; 
                   }
                   return (
-                    <li key={date} className="sm:text-[18px] text-[12px] mt-2 text-center">
-                      <b className={`px-3 py-1 ${colorClass} rounded-xl`}>{date}</b> {count} người đã chọn
+                    <li key={date} className="sm:text-[16px] text-[12px] mt-2 flex sm:flex-row flex-col sm:gap-[10px] gap-[5px] justify-center items-center">
+                      <b className={`px-3 py-1 ${colorClass} rounded-xl`}>{date}</b> 
+                      <div>{count} người đã chọn</div>
                     </li>
                   );
                 })
@@ -461,9 +462,9 @@ const App = () => {
         </div>
       </div>
 
-      <div className="absolute inset-x-0 bottom-0 flex-col items-center justify-center">
-        <h1 className="text-xl font-semibold tracking-wider text-center">Một sản phẩm của DOM Corp</h1>
-        <h1 className="mt-2 text-xs font-normal tracking-wider text-center">
+      <div className="inset-x-0 bottom-0 flex-col items-center justify-center">
+        <h1 className="sm:text-xl text-[18px] font-semibold tracking-wider text-center">Một sản phẩm của DOM Corp</h1>
+        <h1 className="mt-2 sm:text-xs text-[10px] font-normal tracking-wider text-center">
           Liên hệ:
           <a
             href="mailto:quanghuy71847@gmail.com"
