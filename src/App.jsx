@@ -167,26 +167,31 @@ const App = () => {
     const month = 11;
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDayOfMonth = new Date(year, month, 1).getDay();
-
+  
+    const topThreeDates = getTopThreeDates(); 
+  
     const days = [];
     for (let i = 0; i < firstDayOfMonth; i++) {
       days.push(<td key={`empty-${i}`} className="p-2"></td>);
     }
-
+  
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
+      const dateKey = format(date, "dd-MM-yyyy"); 
+      const isTopDate = topThreeDates.includes(dateKey); 
+  
       days.push(
         <td key={day} className="p-2 text-center">
           <button
             onClick={() => handleDateSelect(date)}
             onMouseEnter={() => setHoveredDate(date)}
             onMouseLeave={() => setHoveredDate(null)}
-            className="sm:text-[16px] text-[14px] w-full h-full py-[6px] bg-red-000 rounded-lg hover:bg-gray-300 hover"
+            className={`sm:text-[16px] text-[14px] w-full h-full py-[6px] rounded-lg ${isTopDate ? 'bg-green-300' : 'bg-red-000'} hover:bg-pink-200`}
           >
             {day}
           </button>
           {hoveredDate && hoveredDate.getTime() === date.getTime() && (
-            <div className="absolute p-2 mt-1 bg-white border rounded shadow-lg">
+            <div className="absolute z-20 p-2 mt-1 bg-white border rounded shadow-md text-start">
               <h4 className="font-semibold"></h4>
               <ul>
                 {getPeopleForDate(hoveredDate).length === 0 ? (
@@ -202,18 +207,18 @@ const App = () => {
         </td>
       );
     }
-
+  
     const totalCells = days.length;
     const remainingCells = 7 - (totalCells % 7);
     for (let i = 0; i < remainingCells; i++) {
       days.push(<td key={`remaining-${i}`} className="p-2"></td>);
     }
-
+  
     const weeks = [];
     for (let i = 0; i < days.length; i += 7) {
       weeks.push(<tr key={i}>{days.slice(i, i + 7)}</tr>);
     }
-
+  
     return weeks;
   };
 
@@ -231,27 +236,28 @@ const App = () => {
     });
 
     return (
-      <div className="mb-0">
-        <h2 className="md:text-[18px] sm:text-[16px] text-[12px] font-bold mb-[10px] text-center">Những bạn sẽ tham gia</h2>
-        <ul className="list-container list-disc pl-5 ml-[-10px] max-h-[200px] overflow-y-auto">
-          {Object.entries(peopleMap).length === 0 ? (
-            <li className="sm:text-[18px] text-[12px]">Chưa có ai tham gia</li>
-          ) : (
-            Object.entries(peopleMap).map(([person, dates]) => (
-              <li key={person} className="sm:text-[18px] text-[12px]">
-                <b>{person}</b>: {dates.join(", ")}
-              </li>
-            ))
-          )}
-        </ul>
+      <div className="">
+        <h2 className="md:text-[18px] sm:text-[16px] text-[12px] font-bold mb-[10px] text-center">Những bạn đã chọn ngày </h2>
+        <div className="max-h-[390px] overflow-y-auto">
+          <ul className="list-container list-disc pl-7 ml-[-10px]">
+            {Object.entries(peopleMap).length === 0 ? (
+              <li className="sm:text-[18px] text-[12px]">Chưa có ai tham gia</li>
+            ) : (
+              Object.entries(peopleMap).map(([person, dates]) => (
+                <li key={person} className="sm:text-[18px] text-[12px] my-6">
+                  <b className="font-semibold">{person}</b>   
+                  <br/> 
+                  {dates.join(', ')}
+                  {/* <b className="px-2 py-1 ml-2 bg-pink-200 rounded-lg">{dates}</b> */}
+                </li>
+              ))
+            )}
+          </ul>
+        </div>
+
       </div>
     );
   };
-
-  const handleClearStorage = () => {
-    localStorage.removeItem("tripChoices");
-    setDateChoices([]);
-  }
 
   const getTopThreeDates = () => {
     const dateCount = {};
@@ -263,37 +269,93 @@ const App = () => {
     const dateCountArray = Object.entries(dateCount);
     dateCountArray.sort((a, b) => b[1] - a[1]);
 
-    return dateCountArray.slice(0, 3);
+    return dateCountArray.slice(0, 6).map(([date]) => date);
   };
 
   return (
-    <div className="flex-col items-center justify-center min-h-screen p-10 bg-pink-50">
-      <div className="flex-row items-center justify-center min-h-screen lg:flex">
-        <div className="bg-white p-8 rounded-2xl shadow-lg lg:max-w-[40%] max-w-[100%] w-full lg:mb-20 mb-5">
-          <h1 className="lg:text-3xl md:text-5xl sm:text-4xl text-[24px] font-bold mb-2 text-center text-gray-800">Vũng Tàu tháng 12 - Here we go</h1>
-          <p className="lg:text-lg md:text-2xl sm:text-xl text-[14px] text-gray-500 sm:mb-6 mb-[10px] text-center">Lựa ngày các bé rảnh đi nhé </p>
-          <table className="w-full border-collapse bg-blue-000">
+    // Container 1
+    <div className="flex-col items-center justify-center h-screen p-8 bg-pink-50">
 
+      {/* Container 2 */}
+      <div className="flex-row items-center justify-center min-h-screen lg:flex">
+
+        {/* Container 3: left section */}
+        <div className="bg-white p-8 rounded-2xl shadow-lg lg:max-w-[30%] w-[100%] sm:max-w-[100%] max-w-[100%] lg:mb-20 mb-5">
+          <h1 className="lg:text-3xl md:text-5xl sm:text-4xl text-[24px] font-bold mb-1 text-center text-gray-800">Vũng Tàu tháng 12</h1>
+          <p className="lg:text-base md:text-2xl sm:text-xl text-[14px] text-gray-500 sm:mb-6 mb-[1px] text-center">Lựa ngày các bé rảnh đi nhé</p>
+
+          {/* Lịch thứ + ngày */}
+          <table className="w-full border-collapse bg-blue-000">
             {/* Day */}
-            <thead className="bg-red-000">
+            <thead className="">
               <tr>
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-                  <th key={day} className="sm:text-[16px] text-[14px] py-2 flex-grow">{day}</th>
+                  <th key={day} className="sm:text-[16px] text-[14px] py-0 flex-grow">{day}</th>
                 ))}
               </tr>
             </thead>
-
             {/* Date */}
             <tbody>{generateCalendar()}</tbody>
-
           </table>
-          {confirmedDate && (
-            <div className="mt-4 text-center">
+
+          <p className="mt-3 tracking-tighter text-center">Màu xanh là được nhiều người chọn nhé 💖</p>
+          {/* Bảng lịch thứ + ngày */}
+
+          {/* {confirmedDate && (
+            <div className="my-2 text-center">
               <p className="text-green-600">
                 Đã xác nhận lựa chọn: {format(confirmedDate, "MMMM d, yyyy")}
               </p>
             </div>
-          )}
+          )} */}
+          {/* <div className="flex items-center">
+            {getTopThreeDates().length === 0 ? (
+              ""
+            ) : (
+              <h2 
+                className="md:text-[18px] sm:text-[16px] text-[12px] font-semibold text-start bg-green-300 rounded-lg px-1 py-2"
+                style={{ writingMode: 'vertical-rl', transform: 'rotate(180deg)' }}
+              >
+                Top 3 selected
+              </h2>
+            )}
+
+            <ul className="flex-col sm:pl-0 pl-[10px] items-center justify-center ">
+              {getTopThreeDates().length === 0 ? (
+                ""
+              ) : (
+                getTopThreeDates().map(([date, count], index) => {
+                  let colorClass1;
+                  switch (index) {
+                    case 0:
+                      colorClass1 = "bg-green-300";
+                      break;
+                    case 1:
+                      colorClass1 = "bg-yellow-300";
+                      break;
+                    case 2:
+                      colorClass1 = "bg-red-300";
+                      break;
+                    default:
+                      colorClass1 = "";
+                  }
+
+                  return (
+                    <li
+                      key={date}
+                      className="flex-col sm:text-[16px] text-[12px] my-2 justify-center items-center">
+                      <div className="flex items-center justify-center">
+                        <b className={`sm:px-3 px-[8px] py-1 ${colorClass1}// rounded-xl`}>
+                          {date} : {count} Vote
+                        </b>
+                      </div>
+                    </li>
+                  );
+                })
+              )}
+            </ul>
+          </div> */}
+
         </div>
 
         {isDialogOpen && (
@@ -314,7 +376,12 @@ const App = () => {
                     <div className="p-2 overflow-y-auto border rounded min-h-20">
                       <ul>
                         {getPeopleForDate(selectedDate).map((person, index) => (
-                          <li key={index}>{person}</li>
+                          <li 
+                            key={index}
+                            
+                          >{person}
+            
+                          </li>
                         ))}
                       </ul>
                     </div>
@@ -323,7 +390,7 @@ const App = () => {
                     <label
                       htmlFor="name"
                       className="block mt-6 font-semibold">Pháp danh</label>
-                      <h1 className="mb-4 text-xs">Ví dụ: Nguyễn Quang Huy (NOT hlydthw)</h1>
+                    <h1 className="mb-4 text-xs">Ví dụ: Nguyễn Quang Huy (NOT hlydthw)</h1>
                     <input
                       id="name"
                       type="text"
@@ -418,50 +485,20 @@ const App = () => {
           </div>
         )}
 
-        <div className="flex flex-row lg:justify-start justify-between lg:w-[50%] w-[100%]">
-          <div className="lg:ml-[50px] mb-20 max-h-[476px] min-h-[200px] overflow-y-auto w-[40%] bg-white bg-red-000 rounded-2xl shadow-lg lg:p-2 lg:pt-6 pt-4">
-            <h2 className="md:text-[18px] sm:text-[16px] text-[12px] font-bold text-center mb-[10px]">3 ngày được chọn nhiều nhất</h2>
-            <ul className="flex-col sm:pl-0 pl-[5px] mt-4">
-              {getTopThreeDates().length === 0 ? (
-                <li className="sm:text-[18px] text-[12px]">Chưa có ai tham gia</li>
-              ) : (
-                getTopThreeDates().map(([date, count], index) => {
-                  let colorClass;
-                  switch (index) {
-                    case 0:
-                      colorClass = "bg-green-300"; 
-                      break;
-                    case 1:
-                      colorClass = "bg-yellow-300"; 
-                      break;
-                    case 2:
-                      colorClass = "bg-red-300"; 
-                      break;
-                    default:
-                      colorClass = ""; 
-                  }
-                  return (
-                    <li key={date} className="sm:text-[16px] text-[12px] mt-2 text-center">
-                      <b className={`sm:px-3 px-[8px] py-1 ${colorClass} rounded-xl`}>{date}</b> {count}
-                    </li>
-                  );
-                })
-              )}
-            </ul>
-          </div>
-          {/* <button
+
+        {/* <button
             onClick={handleClearStorage}
             className="px-4 py-2 text-white bg-red-300 rounded hover:bg-red-500"
           >
             Clear All Choices
           </button> */}
-          <div className="flex flex-col lg:ml-[50px] bg-red-000 mb-20 min-h-[200px] w-[58%] bg-white bg-red-000 rounded-2xl shadow-lg lg:p-6 p-[15px]">
-            {renderChosenPeopleList()}
-          </div>
+        <div className="flex flex-col lg:ml-[50px] lg:w-[40%] sm:w-[50%]  bg-white bg-red-000 rounded-2xl shadow-lg lg:p-6 p-[15px] mb-20">
+          {renderChosenPeopleList()}
         </div>
+
       </div>
 
-      <div className="inset-x-0 bottom-0 flex-col items-center justify-center">
+      <div className="inset-x-0 bottom-0 flex-col items-center justify-center mb-5">
         <h1 className="sm:text-xl text-[18px] font-semibold tracking-wider text-center">Một sản phẩm của DOM Corp</h1>
         <h1 className="mt-2 sm:text-xs text-[10px] font-normal tracking-wider text-center">
           Liên hệ:
