@@ -75,7 +75,7 @@ const App = () => {
   useEffect(() => {
     // Firebase
     const fetchData = async () => {
-      const dbRef = ref(database, '/');
+      const dbRef = ref(database, 'dates/');
       try {
         const snapshot = await get(dbRef);
         if (snapshot.exists()) {
@@ -120,7 +120,7 @@ const App = () => {
       // Firebase
       function writeUserData() {
         const db = getDatabase();
-        const dateRef = ref(db, `${dateKey}`);
+        const dateRef = ref(db, `dates/${dateKey}`);
         get(dateRef)
           .then((snapshot) => {
             // If exist -> Add people to this day
@@ -419,9 +419,9 @@ const App = () => {
         )}
 
         <div className="flex flex-row lg:justify-start justify-between lg:w-[50%] w-[100%]">
-          <div className="lg:ml-[50px] mb-20 max-h-[476px] overflow-y-auto w-[48%] bg-white bg-red-000 rounded-2xl shadow-lg lg:p-2 lg:pt-6 pt-4">
-            <h2 className="md:text-xl sm:text-[16px] text-[10px] font-bold text-center mb-[10px]">3 ngày được chọn nhiều nhất</h2>
-            <ul className="flex-col list-none sm:pl-0 pl-[0px] mt-4">
+          <div className="lg:ml-[50px] mb-20 max-h-[476px] min-h-[200px] overflow-y-auto w-[48%] bg-white bg-red-000 rounded-2xl shadow-lg lg:p-2 lg:pt-6 pt-4">
+            <h2 className="md:text-xl sm:text-[16px] text-[12px] font-bold text-center mb-[10px]">3 ngày được chọn nhiều nhất</h2>
+            <ul className="flex-col sm:pl-0 pl-[10px] mt-4">
               {getTopThreeDates().length === 0 ? (
                 <li className="sm:text-[18px] text-[12px]">Chưa có ai tham gia</li>
               ) : (
@@ -441,9 +441,9 @@ const App = () => {
                       colorClass = ""; 
                   }
                   return (
-                    <li key={date} className="md:text-[18px] sm:text-[16px] text-[12px] mt-2 flex sm:flex-row flex-col sm:gap-[10px] gap-[5px] justify-center items-center">
-                      <b className={`px-3 py-1 ${colorClass} rounded-xl`}>{date}</b> {count} người đã chọn
-                      {/* <div></div> */}
+                    <li key={date} className="sm:text-[16px] text-[12px] mt-2 flex sm:flex-row flex-col sm:gap-[10px] gap-[5px] justify-center items-center">
+                      <b className={`px-3 py-1 ${colorClass} rounded-xl`}>{date}</b> 
+                      <div>{count} người đã chọn</div>
                     </li>
                   );
                 })
