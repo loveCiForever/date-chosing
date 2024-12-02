@@ -34,6 +34,7 @@ const App = () => {
   const [hoveredDate, setHoveredDate] = useState(null);
   const dialogRef = useRef(null);
 
+  // quickdraw badges
   // useEffect(() => {
   //   Swal.fire({
   //     title: "Chọn ngày mọi người rảnh để đi Vũng Tàu bên lịch kia nhóe!",
