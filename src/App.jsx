@@ -125,8 +125,19 @@ const App = () => {
           .then((snapshot) => {
             // If exist -> Add people to this day
             if (snapshot.exists()) {
-              const existingData = snapshot.val();
-              // Push new user into the existing array of assignned user
+              const existingData = snapshot.val().people;
+              // Check if that user exist
+              existingData.forEach((user) => {
+                if (name == user)
+                {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Đăng ký rồi mà đăng ký lại d fen",
+                  });
+                  return;
+                }
+              })
               const updatedPeople = existingData.people ? [...existingData.people, name] : [name];
               update(dateRef, { people: updatedPeople })
             }
