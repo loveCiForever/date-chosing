@@ -34,6 +34,7 @@ const App = () => {
   const [hoveredDate, setHoveredDate] = useState(null);
   const dialogRef = useRef(null);
 
+  // quickdraw badges
   // useEffect(() => {
   //   Swal.fire({
   //     title: "Chọn ngày mọi người rảnh để đi Vũng Tàu bên lịch kia nhóe!",
@@ -274,13 +275,13 @@ const App = () => {
 
   return (
     // Container 1
-    <div className="flex-col items-center justify-center h-screen p-8 bg-pink-50">
+    <div className="flex-col items-center justify-center min-h-screen p-8 lg:p-0 bg-pink-50">
 
       {/* Container 2 */}
       <div className="flex-row items-center justify-center min-h-screen lg:flex">
 
         {/* Container 3: left section */}
-        <div className="bg-white p-8 rounded-2xl shadow-lg lg:max-w-[30%] w-[100%] sm:max-w-[100%] max-w-[100%] lg:mb-20 mb-5">
+        <div className="bg-white p-8 rounded-2xl shadow-lg lg:max-w-[30%] w-[100%] sm:max-w-[100%] max-w-[100%] lg:mb-20 mb-5 sm:items-center sm:justify-center">
           <h1 className="lg:text-3xl md:text-5xl sm:text-4xl text-[24px] font-bold mb-1 text-center text-gray-800">Vũng Tàu tháng 12</h1>
           <p className="lg:text-base md:text-2xl sm:text-xl text-[14px] text-gray-500 sm:mb-6 mb-[1px] text-center">Lựa ngày các bé rảnh đi nhé</p>
 
@@ -492,15 +493,13 @@ const App = () => {
           >
             Clear All Choices
           </button> */}
-        <div className="flex flex-col lg:ml-[50px] lg:w-[40%] sm:w-[50%]  bg-white bg-red-000 rounded-2xl shadow-lg lg:p-6 p-[15px] mb-20">
+        <div className="flex flex-col lg:ml-[50px] lg:w-[40%] sm:w-[50%] bg-white rounded-2xl shadow-lg lg:p-6 p-[15px] mb-20">
           {renderChosenPeopleList()}
-        </div>
-
+        </div>     
       </div>
-
-      <div className="inset-x-0 bottom-0 flex-col items-center justify-center mb-5">
+              <div className="lg:pb-10">
         <h1 className="sm:text-xl text-[18px] font-semibold tracking-wider text-center">Một sản phẩm của DOM Corp</h1>
-        <h1 className="mt-2 sm:text-xs text-[10px] font-normal tracking-wider text-center">
+        <div className="mt-2 sm:text-xs text-[10px] font-normal tracking-wider text-center">
           Liên hệ:
           <a
             href="mailto:quanghuy71847@gmail.com"
@@ -511,11 +510,9 @@ const App = () => {
             href="mailto:dtn06052005@gmail.com"
             className="font-semibold"
           > Truong Nguyen (CTO)</a>
-        </h1>
-      </div>
-
+        </div>
+        </div>
     </div>
-
   );
 };
 
