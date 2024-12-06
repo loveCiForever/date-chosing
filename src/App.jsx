@@ -125,33 +125,34 @@ const App = () => {
           .then((snapshot) => {
             // If exist -> Add people to this day
             if (snapshot.exists()) {
-              const existingData = snapshot.val().people;
-              // Check if that user exist
-              existingData.forEach((user) => {
-                if (name == user) {
-                  Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Bạn đã chọn ngày này trước đó rồi nhé",
-                  });
-                  return;
-                }
-              })
-              const updatedPeople = existingData.people ? [...existingData.people, name] : [name];
-              update(dateRef, { people: updatedPeople })
+              const existingData = snapshot.val();
+              const existingPeople = existingData.people || [];
+    
+              // Check if that user exists
+              if (existingPeople.includes(name)) {
+                Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: "Bạn đã chọn ngày này trước đó rồi nhé",
+                });
+                return;
+              }
+    
+              // Add the new user to the existing list
+              const updatedPeople = [...existingPeople, name];
+              update(dateRef, { people: updatedPeople });
             }
             // If not exist -> Create new object
             else {
               set(dateRef, {
                 people: [name]
-              })
+              });
             }
           })
           .catch((error) => {
             console.error("Error reading data from Firebase: ", error);
           });
-      }
-
+    }
       writeUserData();
     }
   };
