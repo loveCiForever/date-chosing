@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Swal from 'sweetalert2';
 import { format } from "date-fns";
-import Wave from 'react-wavify';
 
 // Firebase Config
 import { initializeApp } from "firebase/app";
@@ -34,29 +33,10 @@ const App = () => {
   const [hoveredDate, setHoveredDate] = useState(null);
   const dialogRef = useRef(null);
 
-  // useEffect(() => {
-  //   Swal.fire({
-  //     title: "Chọn ngày mọi người rảnh để đi Vũng Tàu bên lịch kia nhenn. Lưu ý sau khi chọn 1 ngày bạn sẽ điền tên, vui lòng điền 1 tên duy nhất trong các lựa chọn (Not HlyyDthw, HlyyDthww, ...)",
-  //     showClass: {
-  //       popup: `
-  //         animate__animated
-  //         animate__fadeInUp
-  //         animate__faster
-  //       `
-  //     },
-  //     hideClass: {
-  //       popup: `
-  //         animate__animated
-  //         animate__fadeOutDown
-  //         animate__faster
-  //       `
-  //     }
-  //   });
-  // }, [])
-
   useEffect(() => {
     Swal.fire({
       title: "Nhập tên đi mấy iem",
+      text: "Sau khi nhập tên thì có em có thể chọn nhiều ngày nhé. Sau khi F5 reload trang thì phải điền lại chính xác tên lần trước nhen",
       input: "text",
       inputAttributes: {
         autocapitalize: "off"
@@ -64,7 +44,13 @@ const App = () => {
       showCancelButton: true,
       confirmButtonText: "Ok",
       showLoaderOnConfirm: true,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
       preConfirm: (login) => {
+        if (!login) {
+          Swal.showValidationMessage("Dume may điền tên vào");
+          return false;
+        }
         localStorage.setItem("currentUser", login);
       }
     });
@@ -92,13 +78,24 @@ const App = () => {
     // Firebase
     const currentUser = localStorage.getItem("currentUser");
     const fetchData = async () => {
-      const dbRef = ref(database, `users/${currentUser}/`);
+      const dbRef = ref(database, `users/`);
       try {
         const snapshot = await get(dbRef);
         if (snapshot.exists()) {
           const data = snapshot.val();
-          console.log(data);
-          // setDateChoices(formattedChoices);
+          const formattedChoices = Object.entries(data).reduce((acc, [name, entry]) => {
+            entry.dates.forEach(date => {
+              const dateObj = acc.find(d => d.date === date);
+
+              if (dateObj) {
+                dateObj.people.push(name);
+              } else {
+                acc.push({ date, people: [name] });
+              }
+            });
+            return acc;
+          }, []);
+          setDateChoices(formattedChoices);
         }
       } catch (error) {
         console.error("Error fetching data from Firebase:", error);
@@ -138,15 +135,14 @@ const App = () => {
         const userRef = ref(db, `users/${currentUser}/dates`);
         const snapshot = await get(userRef);
         let existingDates = [];
-        if (snapshot.exists()) 
-        {
-          existingDates = snapshot.val(); 
+        if (snapshot.exists()) {
+          existingDates = snapshot.val();
         }
         const updatedDates = Array.isArray(existingDates)
-        ? existingDates.includes(dateKey)   
-          ? existingDates 
-          : [...existingDates, dateKey]
-        : [dateKey];
+          ? existingDates.includes(dateKey)
+            ? existingDates
+            : [...existingDates, dateKey]
+          : [dateKey];
         set(userRef, updatedDates);
       }
       writeUserData();
@@ -161,7 +157,7 @@ const App = () => {
 
   const generateCalendar = () => {
     const year = 2024;
-    const month = 11;
+    const month = 11; // index start from 0
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDayOfMonth = new Date(year, month, 1).getDay();
 
@@ -183,7 +179,7 @@ const App = () => {
             onClick={() => handleDateSelect(date)}
             onMouseEnter={() => setHoveredDate(date)}
             onMouseLeave={() => setHoveredDate(null)}
-            className={`sm:text-[16px] text-[14px] w-full h-full py-[6px] rounded-lg ${isTopDate ? 'bg-green-300' : 'bg-red-000'} hover:bg-pink-200`}
+            className={`sm:text-[16px] text-[14px] w-full h-full py-[6px] px-[6px] bg-red-200// rounded-lg ${isTopDate ? 'bg-green-300' : 'bg-red-000'} hover:bg-pink-200`}
           >
             {day}
           </button>
@@ -234,7 +230,7 @@ const App = () => {
 
     return (
       <div className="">
-        <h2 className="md:text-[18px] sm:text-[16px] text-[12px] font-bold mb-[10px] text-center">Những bạn đã chọn ngày </h2>
+        <h2 className="md:text-[18px] sm:text-[16px] text-[12px] font-bold mb-[10px] text-center">Những con tró đã chọn ngày</h2>
         <div className="h-[380px] overflow-y-auto">
           <ul className="list-container list-disc pl-7 ml-[-10px]">
             {Object.entries(peopleMap).length === 0 ? (
