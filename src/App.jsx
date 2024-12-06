@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import Swal from 'sweetalert2';
 import { format } from "date-fns";
-import Wave from 'react-wavify';
 
 // Firebase Config
 import { initializeApp } from "firebase/app";
@@ -33,26 +32,6 @@ const App = () => {
   const [dateChoices, setDateChoices] = useState([]);
   const [hoveredDate, setHoveredDate] = useState(null);
   const dialogRef = useRef(null);
-
-  // useEffect(() => {
-  //   Swal.fire({
-  //     title: "Chọn ngày mọi người rảnh để đi Vũng Tàu bên lịch kia nhenn. Lưu ý sau khi chọn 1 ngày bạn sẽ điền tên, vui lòng điền 1 tên duy nhất trong các lựa chọn (Not HlyyDthw, HlyyDthww, ...)",
-  //     showClass: {
-  //       popup: `
-  //         animate__animated
-  //         animate__fadeInUp
-  //         animate__faster
-  //       `
-  //     },
-  //     hideClass: {
-  //       popup: `
-  //         animate__animated
-  //         animate__fadeOutDown
-  //         animate__faster
-  //       `
-  //     }
-  //   });
-  // }, [])
 
   useEffect(() => {
     Swal.fire({
@@ -161,7 +140,7 @@ const App = () => {
 
   const generateCalendar = () => {
     const year = 2024;
-    const month = 11;
+    const month = 11; // index start from 0
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDayOfMonth = new Date(year, month, 1).getDay();
 
@@ -183,7 +162,7 @@ const App = () => {
             onClick={() => handleDateSelect(date)}
             onMouseEnter={() => setHoveredDate(date)}
             onMouseLeave={() => setHoveredDate(null)}
-            className={`sm:text-[16px] text-[14px] w-full h-full py-[6px] rounded-lg ${isTopDate ? 'bg-green-300' : 'bg-red-000'} hover:bg-pink-200`}
+            className={`sm:text-[16px] text-[14px] w-full h-full py-[6px] px-[6px] bg-red-200// rounded-lg ${isTopDate ? 'bg-green-300' : 'bg-red-000'} hover:bg-pink-200`}
           >
             {day}
           </button>
@@ -234,7 +213,7 @@ const App = () => {
 
     return (
       <div className="">
-        <h2 className="md:text-[18px] sm:text-[16px] text-[12px] font-bold mb-[10px] text-center">Những bạn đã chọn ngày </h2>
+        <h2 className="md:text-[18px] sm:text-[16px] text-[12px] font-bold mb-[10px] text-center">Những con tró đã chọn ngày</h2>
         <div className="h-[380px] overflow-y-auto">
           <ul className="list-container list-disc pl-7 ml-[-10px]">
             {Object.entries(peopleMap).length === 0 ? (
