@@ -36,6 +36,7 @@ const App = () => {
   useEffect(() => {
     Swal.fire({
       title: "Nhập tên đi mấy iem",
+      text: "Sau khi nhập tên thì có em có thể chọn nhiều ngày nhé. Sau khi F5 reload trang thì phải điền lại chính xác tên lần trước nhen",
       input: "text",
       inputAttributes: {
         autocapitalize: "off"
@@ -47,7 +48,7 @@ const App = () => {
       allowEscapeKey: false,
       preConfirm: (login) => {
         if (!login) {
-          Swal.showValidationMessage("Nhập tên đi homies!");
+          Swal.showValidationMessage("Dume may điền tên vào");
           return false;
         }
         localStorage.setItem("currentUser", login);
