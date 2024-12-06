@@ -43,7 +43,13 @@ const App = () => {
       showCancelButton: true,
       confirmButtonText: "Ok",
       showLoaderOnConfirm: true,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
       preConfirm: (login) => {
+        if (!login) {
+          Swal.showValidationMessage("Nhập tên đi homies!");
+          return false;
+        }
         localStorage.setItem("currentUser", login);
       }
     });
@@ -71,13 +77,24 @@ const App = () => {
     // Firebase
     const currentUser = localStorage.getItem("currentUser");
     const fetchData = async () => {
-      const dbRef = ref(database, `users/${currentUser}/`);
+      const dbRef = ref(database, `users/`);
       try {
         const snapshot = await get(dbRef);
         if (snapshot.exists()) {
           const data = snapshot.val();
-          console.log(data);
-          // setDateChoices(formattedChoices);
+          const formattedChoices = Object.entries(data).reduce((acc, [name, entry]) => {
+            entry.dates.forEach(date => {
+              const dateObj = acc.find(d => d.date === date);
+
+              if (dateObj) {
+                dateObj.people.push(name);
+              } else {
+                acc.push({ date, people: [name] });
+              }
+            });
+            return acc;
+          }, []);
+          setDateChoices(formattedChoices);
         }
       } catch (error) {
         console.error("Error fetching data from Firebase:", error);
@@ -117,15 +134,14 @@ const App = () => {
         const userRef = ref(db, `users/${currentUser}/dates`);
         const snapshot = await get(userRef);
         let existingDates = [];
-        if (snapshot.exists()) 
-        {
-          existingDates = snapshot.val(); 
+        if (snapshot.exists()) {
+          existingDates = snapshot.val();
         }
         const updatedDates = Array.isArray(existingDates)
-        ? existingDates.includes(dateKey)   
-          ? existingDates 
-          : [...existingDates, dateKey]
-        : [dateKey];
+          ? existingDates.includes(dateKey)
+            ? existingDates
+            : [...existingDates, dateKey]
+          : [dateKey];
         set(userRef, updatedDates);
       }
       writeUserData();
