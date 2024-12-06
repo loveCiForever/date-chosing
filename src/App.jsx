@@ -34,26 +34,6 @@ const App = () => {
   const [hoveredDate, setHoveredDate] = useState(null);
   const dialogRef = useRef(null);
 
-  // useEffect(() => {
-  //   Swal.fire({
-  //     title: "Chọn ngày mọi người rảnh để đi Vũng Tàu bên lịch kia nhenn. Lưu ý sau khi chọn 1 ngày bạn sẽ điền tên, vui lòng điền 1 tên duy nhất trong các lựa chọn (Not HlyyDthw, HlyyDthww, ...)",
-  //     showClass: {
-  //       popup: `
-  //         animate__animated
-  //         animate__fadeInUp
-  //         animate__faster
-  //       `
-  //     },
-  //     hideClass: {
-  //       popup: `
-  //         animate__animated
-  //         animate__fadeOutDown
-  //         animate__faster
-  //       `
-  //     }
-  //   });
-  // }, [])
-
   useEffect(() => {
     Swal.fire({
       title: "Nhập tên đi mấy iem",
@@ -64,7 +44,13 @@ const App = () => {
       showCancelButton: true,
       confirmButtonText: "Ok",
       showLoaderOnConfirm: true,
+      allowOutsideClick: false,
+      allowEscapeKey: false,
       preConfirm: (login) => {
+        if (!login) {
+          Swal.showValidationMessage("Nhập tên đi homies!");
+          return false;
+        }
         localStorage.setItem("currentUser", login);
       }
     });
@@ -92,13 +78,24 @@ const App = () => {
     // Firebase
     const currentUser = localStorage.getItem("currentUser");
     const fetchData = async () => {
-      const dbRef = ref(database, `users/${currentUser}/`);
+      const dbRef = ref(database, `users/`);
       try {
         const snapshot = await get(dbRef);
         if (snapshot.exists()) {
           const data = snapshot.val();
-          console.log(data);
-          // setDateChoices(formattedChoices);
+          const formattedChoices = Object.entries(data).reduce((acc, [name, entry]) => {
+            entry.dates.forEach(date => {
+              const dateObj = acc.find(d => d.date === date);
+
+              if (dateObj) {
+                dateObj.people.push(name);
+              } else {
+                acc.push({ date, people: [name] });
+              }
+            });
+            return acc;
+          }, []);
+          setDateChoices(formattedChoices);
         }
       } catch (error) {
         console.error("Error fetching data from Firebase:", error);
@@ -138,15 +135,14 @@ const App = () => {
         const userRef = ref(db, `users/${currentUser}/dates`);
         const snapshot = await get(userRef);
         let existingDates = [];
-        if (snapshot.exists()) 
-        {
-          existingDates = snapshot.val(); 
+        if (snapshot.exists()) {
+          existingDates = snapshot.val();
         }
         const updatedDates = Array.isArray(existingDates)
-        ? existingDates.includes(dateKey)   
-          ? existingDates 
-          : [...existingDates, dateKey]
-        : [dateKey];
+          ? existingDates.includes(dateKey)
+            ? existingDates
+            : [...existingDates, dateKey]
+          : [dateKey];
         set(userRef, updatedDates);
       }
       writeUserData();
