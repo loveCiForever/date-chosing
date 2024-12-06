@@ -34,26 +34,25 @@ const App = () => {
   const [hoveredDate, setHoveredDate] = useState(null);
   const dialogRef = useRef(null);
 
-  // quickdraw badges
-  // useEffect(() => {
-  //   Swal.fire({
-  //     title: "Chọn ngày mọi người rảnh để đi Vũng Tàu bên lịch kia nhóe!",
-  //     showClass: {
-  //       popup: `
-  //         animate__animated
-  //         animate__fadeInUp
-  //         animate__faster
-  //       `
-  //     },
-  //     hideClass: {
-  //       popup: `
-  //         animate__animated
-  //         animate__fadeOutDown
-  //         animate__faster
-  //       `
-  //     }
-  //   });
-  // }, [])
+  useEffect(() => {
+    Swal.fire({
+      title: "Chọn ngày mọi người rảnh để đi Vũng Tàu bên lịch kia nhenn. Lưu ý sau khi chọn 1 ngày bạn sẽ điền tên, vui lòng điền 1 tên duy nhất trong các lựa chọn (Not HlyyDthw, HlyyDthww, ...)",
+      showClass: {
+        popup: `
+          animate__animated
+          animate__fadeInUp
+          animate__faster
+        `
+      },
+      hideClass: {
+        popup: `
+          animate__animated
+          animate__fadeOutDown
+          animate__faster
+        `
+      }
+    });
+  }, [])
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -133,7 +132,7 @@ const App = () => {
                   Swal.fire({
                     icon: "error",
                     title: "Oops...",
-                    text: "Đăng ký rồi mà đăng ký lại d fen",
+                    text: "Bạn đã chọn ngày này trước đó rồi nhé",
                   });
                   return;
                 }
@@ -239,7 +238,7 @@ const App = () => {
     return (
       <div className="">
         <h2 className="md:text-[18px] sm:text-[16px] text-[12px] font-bold mb-[10px] text-center">Những bạn đã chọn ngày </h2>
-        <div className="max-h-[390px] overflow-y-auto">
+        <div className="h-[380px] overflow-y-auto">
           <ul className="list-container list-disc pl-7 ml-[-10px]">
             {Object.entries(peopleMap).length === 0 ? (
               <li className="sm:text-[18px] text-[12px]">Chưa có ai tham gia</li>
@@ -278,12 +277,12 @@ const App = () => {
     <div className="flex-col items-center justify-center min-h-screen p-8 lg:p-0 bg-pink-50">
 
       {/* Container 2 */}
-      <div className="flex-row items-center justify-center min-h-screen lg:flex">
+      <div className="flex-row items-center justify-center min-h-screen lg:flex md:px-[200px]">
 
         {/* Container 3: left section */}
-        <div className="bg-white p-8 rounded-2xl shadow-lg lg:max-w-[30%] w-[100%] sm:max-w-[100%] max-w-[100%] lg:mb-20 mb-5 sm:items-center sm:justify-center">
-          <h1 className="lg:text-3xl md:text-5xl sm:text-4xl text-[24px] font-bold mb-1 text-center text-gray-800">Vũng Tàu tháng 12</h1>
-          <p className="lg:text-base md:text-2xl sm:text-xl text-[14px] text-gray-500 sm:mb-6 mb-[1px] text-center">Lựa ngày các bé rảnh đi nhé</p>
+        <div className="bg-white p-8 rounded-2xl shadow-lg lg:max-w-[40%] md:max-w-[100%] w-[100%] sm:max-w-[100%] max-w-[100%] lg:mb-20 mb-5 sm:items-center sm:justify-center md:item-center md:justify-center">
+          <h1 className="lg:text-3xl md:text-4xl sm:text-4xl text-[20px] font-bold mb-1 text-center text-gray-800">Vũng Tàu tháng 12</h1>
+          <p className="lg:text-base md:text-xl sm:text-xl text-[14px] text-gray-500 sm:mb-6 mb-[1px] text-center">Lựa ngày các bé rảnh đi nhé</p>
 
           {/* Lịch thứ + ngày */}
           <table className="w-full border-collapse bg-blue-000">
@@ -493,24 +492,25 @@ const App = () => {
           >
             Clear All Choices
           </button> */}
-        <div className="flex flex-col lg:ml-[50px] lg:w-[40%] sm:w-[50%] bg-white rounded-2xl shadow-lg lg:p-6 p-[15px] mb-20">
+        <div className="flex flex-col lg:max-w-[40%] w-[100%] sm:max-w-[100%] max-w-[100%] lg:ml-10 bg-white rounded-2xl shadow-lg lg:p-6 p-[15px] mb-20">
           {renderChosenPeopleList()}
         </div>     
       </div>
-              <div className="lg:pb-10">
-        <h1 className="sm:text-xl text-[18px] font-semibold tracking-wider text-center">Một sản phẩm của DOM Corp</h1>
-        <div className="mt-2 sm:text-xs text-[10px] font-normal tracking-wider text-center">
-          Liên hệ:
-          <a
-            href="mailto:quanghuy71847@gmail.com"
-            className="font-semibold"
-          > Quang Huy (CEO)</a>&nbsp;
-          &
-          <a
-            href="mailto:dtn06052005@gmail.com"
-            className="font-semibold"
-          > Truong Nguyen (CTO)</a>
-        </div>
+        <div className="lg:pb-10">
+          <h1 className="sm:text-xl text-[18px] font-semibold tracking-wider text-center">Một sản phẩm của DOM Corp</h1>
+          <div className="mt-2 sm:text-xs text-[10px] font-normal tracking-wider text-center">
+            Liên hệ:
+            <a
+              href="mailto:quanghuy71847@gmail.com"
+              className="font-semibold"
+            > Quang Huy (CEO + UI/UX Design + Solution Architect + Business Analyst + FrontEnd Developer)</a>&nbsp;
+
+            <br/>
+            <a
+              href="mailto:dtn06052005@gmail.com"
+              className="font-semibold"
+            > Truong Nguyen (CTO + Cloud Engineer + BackEnd Developer + Suc King + DataBase Administrator)</a>
+          </div>
         </div>
     </div>
   );
