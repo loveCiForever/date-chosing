@@ -34,22 +34,38 @@ const App = () => {
   const [hoveredDate, setHoveredDate] = useState(null);
   const dialogRef = useRef(null);
 
+  // useEffect(() => {
+  //   Swal.fire({
+  //     title: "Chọn ngày mọi người rảnh để đi Vũng Tàu bên lịch kia nhenn. Lưu ý sau khi chọn 1 ngày bạn sẽ điền tên, vui lòng điền 1 tên duy nhất trong các lựa chọn (Not HlyyDthw, HlyyDthww, ...)",
+  //     showClass: {
+  //       popup: `
+  //         animate__animated
+  //         animate__fadeInUp
+  //         animate__faster
+  //       `
+  //     },
+  //     hideClass: {
+  //       popup: `
+  //         animate__animated
+  //         animate__fadeOutDown
+  //         animate__faster
+  //       `
+  //     }
+  //   });
+  // }, [])
+
   useEffect(() => {
     Swal.fire({
-      title: "Chọn ngày mọi người rảnh để đi Vũng Tàu bên lịch kia nhenn. Lưu ý sau khi chọn 1 ngày bạn sẽ điền tên, vui lòng điền 1 tên duy nhất trong các lựa chọn (Not HlyyDthw, HlyyDthww, ...)",
-      showClass: {
-        popup: `
-          animate__animated
-          animate__fadeInUp
-          animate__faster
-        `
+      title: "Nhập tên đi mấy iem",
+      input: "text",
+      inputAttributes: {
+        autocapitalize: "off"
       },
-      hideClass: {
-        popup: `
-          animate__animated
-          animate__fadeOutDown
-          animate__faster
-        `
+      showCancelButton: true,
+      confirmButtonText: "Ok",
+      showLoaderOnConfirm: true,
+      preConfirm: (login) => {
+        localStorage.setItem("currentUser", login);
       }
     });
   }, [])
@@ -74,17 +90,15 @@ const App = () => {
 
   useEffect(() => {
     // Firebase
+    const currentUser = localStorage.getItem("currentUser");
     const fetchData = async () => {
-      const dbRef = ref(database, 'dates/');
+      const dbRef = ref(database, `users/${currentUser}/`);
       try {
         const snapshot = await get(dbRef);
         if (snapshot.exists()) {
           const data = snapshot.val();
-          const formattedChoices = Object.entries(data).map(([date, value]) => ({
-            date,
-            people: value.people || []
-          }));
-          setDateChoices(formattedChoices);
+          console.log(data);
+          // setDateChoices(formattedChoices);
         }
       } catch (error) {
         console.error("Error fetching data from Firebase:", error);
@@ -98,64 +112,46 @@ const App = () => {
     setIsDialogOpen(true);
   };
 
-  const handleConfirm = () => {
-    if (selectedDate && name) {
+  useEffect(() => {
+    if (selectedDate) {
+      const currentUser = localStorage.getItem("currentUser");
       const dateKey = format(selectedDate, "dd-MM-yyyy");
       const updatedChoices = [...dateChoices];
       const existingChoice = updatedChoices.find(choice => choice.date === dateKey);
 
       if (existingChoice) {
-        if (!existingChoice.people.includes(name)) {
-          existingChoice.people.push(name);
+        if (!existingChoice.people.includes(currentUser)) {
+          existingChoice.people.push(currentUser);
         }
       } else {
-        updatedChoices.push({ date: dateKey, people: [name] });
+        updatedChoices.push({ date: dateKey, people: [currentUser] });
       }
 
       setDateChoices(updatedChoices);
       setConfirmedDate(selectedDate);
       setIsDialogOpen(false);
-      setName("");
+      // setName("");
 
       // Firebase
-      function writeUserData() {
+      const writeUserData = async () => {
         const db = getDatabase();
-        const dateRef = ref(db, `dates/${dateKey}`);
-        get(dateRef)
-          .then((snapshot) => {
-            // If exist -> Add people to this day
-            if (snapshot.exists()) {
-              const existingData = snapshot.val();
-              const existingPeople = existingData.people || [];
-    
-              // Check if that user exists
-              if (existingPeople.includes(name)) {
-                Swal.fire({
-                  icon: "error",
-                  title: "Oops...",
-                  text: "Bạn đã chọn ngày này trước đó rồi nhé",
-                });
-                return;
-              }
-    
-              // Add the new user to the existing list
-              const updatedPeople = [...existingPeople, name];
-              update(dateRef, { people: updatedPeople });
-            }
-            // If not exist -> Create new object
-            else {
-              set(dateRef, {
-                people: [name]
-              });
-            }
-          })
-          .catch((error) => {
-            console.error("Error reading data from Firebase: ", error);
-          });
-    }
+        const userRef = ref(db, `users/${currentUser}/dates`);
+        const snapshot = await get(userRef);
+        let existingDates = [];
+        if (snapshot.exists()) 
+        {
+          existingDates = snapshot.val(); 
+        }
+        const updatedDates = Array.isArray(existingDates)
+        ? existingDates.includes(dateKey)   
+          ? existingDates 
+          : [...existingDates, dateKey]
+        : [dateKey];
+        set(userRef, updatedDates);
+      }
       writeUserData();
     }
-  };
+  }, [selectedDate])
 
   const getPeopleForDate = (date) => {
     const dateKey = format(date, "dd-MM-yyyy");
@@ -168,19 +164,19 @@ const App = () => {
     const month = 11;
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDayOfMonth = new Date(year, month, 1).getDay();
-  
-    const topThreeDates = getTopThreeDates(); 
-  
+
+    const topThreeDates = getTopThreeDates();
+
     const days = [];
     for (let i = 0; i < firstDayOfMonth; i++) {
       days.push(<td key={`empty-${i}`} className="p-2"></td>);
     }
-  
+
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
-      const dateKey = format(date, "dd-MM-yyyy"); 
-      const isTopDate = topThreeDates.includes(dateKey); 
-  
+      const dateKey = format(date, "dd-MM-yyyy");
+      const isTopDate = topThreeDates.includes(dateKey);
+
       days.push(
         <td key={day} className="p-2 text-center">
           <button
@@ -208,18 +204,18 @@ const App = () => {
         </td>
       );
     }
-  
+
     const totalCells = days.length;
     const remainingCells = 7 - (totalCells % 7);
     for (let i = 0; i < remainingCells; i++) {
       days.push(<td key={`remaining-${i}`} className="p-2"></td>);
     }
-  
+
     const weeks = [];
     for (let i = 0; i < days.length; i += 7) {
       weeks.push(<tr key={i}>{days.slice(i, i + 7)}</tr>);
     }
-  
+
     return weeks;
   };
 
@@ -246,8 +242,8 @@ const App = () => {
             ) : (
               Object.entries(peopleMap).map(([person, dates]) => (
                 <li key={person} className="sm:text-[18px] text-[12px] my-6">
-                  <b className="font-semibold">{person}</b>   
-                  <br/> 
+                  <b className="font-semibold">{person}</b>
+                  <br />
                   {dates.join(', ')}
                   {/* <b className="px-2 py-1 ml-2 bg-pink-200 rounded-lg">{dates}</b> */}
                 </li>
@@ -359,7 +355,7 @@ const App = () => {
 
         </div>
 
-        {isDialogOpen && (
+        {/* {isDialogOpen && (
           <div className="fixed inset-0 flex items-center justify-center pb-20 bg-black bg-opacity-70">
             <div
               ref={dialogRef}
@@ -377,11 +373,11 @@ const App = () => {
                     <div className="p-2 overflow-y-auto border rounded min-h-20">
                       <ul>
                         {getPeopleForDate(selectedDate).map((person, index) => (
-                          <li 
+                          <li
                             key={index}
-                            
+
                           >{person}
-            
+
                           </li>
                         ))}
                       </ul>
@@ -414,7 +410,7 @@ const App = () => {
               )}
             </div>
           </div>
-        )}
+        )} */}
 
         {!isDialogOpen && (
           <div className="">
@@ -495,24 +491,24 @@ const App = () => {
           </button> */}
         <div className="flex flex-col lg:max-w-[40%] w-[100%] sm:max-w-[100%] max-w-[100%] lg:ml-10 bg-white rounded-2xl shadow-lg lg:p-6 p-[15px] mb-20">
           {renderChosenPeopleList()}
-        </div>     
-      </div>
-        <div className="lg:pb-10">
-          <h1 className="sm:text-xl text-[18px] font-semibold tracking-wider text-center">Một sản phẩm của DOM Corp</h1>
-          <div className="mt-2 sm:text-xs text-[10px] font-normal tracking-wider text-center">
-            Liên hệ:
-            <a
-              href="mailto:quanghuy71847@gmail.com"
-              className="font-semibold"
-            > Quang Huy (CEO + UI/UX Design + Solution Architect + Business Analyst + FrontEnd Developer)</a>&nbsp;
-
-            <br/>
-            <a
-              href="mailto:dtn06052005@gmail.com"
-              className="font-semibold"
-            > Truong Nguyen (CTO + Cloud Engineer + BackEnd Developer + Suc King + DataBase Administrator)</a>
-          </div>
         </div>
+      </div>
+      <div className="lg:pb-10">
+        <h1 className="sm:text-xl text-[18px] font-semibold tracking-wider text-center">Một sản phẩm của DOM Corp</h1>
+        <div className="mt-2 sm:text-xs text-[10px] font-normal tracking-wider text-center">
+          Liên hệ:
+          <a
+            href="mailto:quanghuy71847@gmail.com"
+            className="font-semibold"
+          > Quang Huy (CEO + UI/UX Design + Solution Architect + Business Analyst + FrontEnd Developer)</a>&nbsp;
+
+          <br />
+          <a
+            href="mailto:dtn06052005@gmail.com"
+            className="font-semibold"
+          > Truong Nguyen (CTO + Cloud Engineer + BackEnd Developer + Suc King + DataBase Administrator)</a>
+        </div>
+      </div>
     </div>
   );
 };
