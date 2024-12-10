@@ -6,12 +6,12 @@ import Wave from 'react-wavify';
 // MUI Time Picker
 import { LocalizationProvider, StaticTimePicker } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import ReactDOM from 'react-dom';
+import ReactDOM from 'react-dom/client';
 
 // Firebase Config
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getDatabase, ref, set, get } from "firebase/database";
+import { getDatabase, ref, set, get, onValue } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCwczS0581iWd_ZM-mhjPH_8Hn2aTAW_m8",
@@ -106,11 +106,6 @@ const App = () => {
 
             return acc;
           }, []);
-          const tmp = Object.entries(data).map(([name, data]) => ({
-            name,
-            dates: data
-          }));
-          setTransformedData(tmp);
           setDateChoices(formattedChoices);
         }
       } catch (error) {
@@ -119,6 +114,44 @@ const App = () => {
     };
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const dbRef = ref(database, `users/`);
+      try {
+        const snapshot = await get(dbRef);
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const tmp = Object.entries(data).map(([name, data]) => ({
+            name,
+            dates: data
+          }));
+          setTransformedData(tmp);
+        }
+      } catch (error) {
+        console.error("Error fetching data from Firebase:", error);
+      }
+    };
+    fetchData();
+
+    // Check data change
+    const dbRef = ref(database, 'users/');
+    const handleDataChange = (snapshot) => {
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const tmp = Object.entries(data).map(([name, data]) => ({
+          name,
+          dates: data
+        }));
+        setTransformedData(tmp);
+      }
+    };
+    onValue(dbRef, handleDataChange);
+
+    return () => {
+      off(dbRef, 'value', handleDataChange);
+    };
+  }, [])
 
   const handleDateSelect = (date) => {
     Swal.fire({
@@ -155,6 +188,21 @@ const App = () => {
       const currentUser = localStorage.getItem("currentUser");
       const timeKey = selectedTime.format("HH:mm");
       const dateKey = format(selectedDate, "dd-MM-yyyy");
+      const updatedChoices = [...dateChoices];
+      const existingChoice = updatedChoices.find(choice => choice.date === dateKey);
+
+      if (existingChoice) {
+        if (!existingChoice.people.includes(currentUser)) {
+          existingChoice.people.push(currentUser);
+        }
+      } else {
+        updatedChoices.push({ date: dateKey, people: [currentUser] });
+      }
+
+      setDateChoices(updatedChoices);
+      setConfirmedDate(selectedDate);
+      setIsDialogOpen(false);
+      // setName("");
 
       // Firebase
       const writeUserData = async () => {
@@ -175,22 +223,6 @@ const App = () => {
         set(userRef, updatedDates);
       }
       writeUserData();
-
-      const updatedChoices = [...dateChoices];
-      const existingChoice = updatedChoices.find(choice => choice.date === dateKey);
-
-      if (existingChoice) {
-        if (!existingChoice.people.includes(currentUser)) {
-          existingChoice.people.push(currentUser);
-        }
-      } else {
-        updatedChoices.push({ date: dateKey, people: [currentUser] });
-      }
-
-      setDateChoices(updatedChoices);
-      setConfirmedDate(selectedDate);
-      setIsDialogOpen(false);
-      // setName("");
     }
   }, [selectedDate, selectedTime])
 
@@ -256,8 +288,13 @@ const App = () => {
     for (let i = 0; i < days.length; i += 7) {
       weeks.push(<tr key={i}>{days.slice(i, i + 7)}</tr>);
     }
-
     return weeks;
+  };
+
+  const parseDateTime = (date, time) => {
+    const [day, month, year] = date.split('-');
+    const [hours, minutes] = time.split(':');
+    return new Date(year, month - 1, day, hours, minutes);
   };
 
   const renderChosenPeopleList = () => {
@@ -276,9 +313,17 @@ const App = () => {
                   <b className="font-semibold">{name}</b>
                   <br />
                   <ul>
-                    {dates.dates.map((item, index) => (
-                      <li key={index}>{item.date} từ {item.time}</li>
-                    ))}
+                    {dates.dates
+                      .sort((a, b) => {
+                        const dateA = parseDateTime(a.date, a.time);
+                        const dateB = parseDateTime(b.date, b.time);
+                        return dateA - dateB; 
+                      })
+                      .map((item, index) => (
+                        <li key={index}>
+                          {item.date} từ {item.time}
+                        </li>
+                      ))}
                   </ul>
                 </li>
               ))
