@@ -11,7 +11,7 @@ import ReactDOM from 'react-dom/client';
 // Firebase Config
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-import { getDatabase, ref, set, get, onValue } from "firebase/database";
+import { getDatabase, ref, set, get, onValue, update } from "firebase/database";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCwczS0581iWd_ZM-mhjPH_8Hn2aTAW_m8",
@@ -92,40 +92,21 @@ const App = () => {
           const formattedChoices = Object.entries(data).reduce((acc, [name, { dates }]) => {
             dates.forEach(({ date }) => {
               const dateObj = acc.find(d => d.date === date);
-
               if (dateObj) {
-                // Add the person to the existing date object
                 if (!dateObj.people.includes(name)) {
                   dateObj.people.push(name);
                 }
               } else {
-                // Create a new date object with the person
                 acc.push({ date, people: [name] });
               }
             });
-
             return acc;
           }, []);
-          setDateChoices(formattedChoices);
-        }
-      } catch (error) {
-        console.error("Error fetching data from Firebase:", error);
-      }
-    };
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const dbRef = ref(database, `users/`);
-      try {
-        const snapshot = await get(dbRef);
-        if (snapshot.exists()) {
-          const data = snapshot.val();
           const tmp = Object.entries(data).map(([name, data]) => ({
             name,
             dates: data
           }));
+          setDateChoices(formattedChoices);
           setTransformedData(tmp);
         }
       } catch (error) {
@@ -133,25 +114,7 @@ const App = () => {
       }
     };
     fetchData();
-
-    // Check data change
-    const dbRef = ref(database, 'users/');
-    const handleDataChange = (snapshot) => {
-      if (snapshot.exists()) {
-        const data = snapshot.val();
-        const tmp = Object.entries(data).map(([name, data]) => ({
-          name,
-          dates: data
-        }));
-        setTransformedData(tmp);
-      }
-    };
-    onValue(dbRef, handleDataChange);
-
-    return () => {
-      off(dbRef, 'value', handleDataChange);
-    };
-  }, [])
+  }, []);
 
   const handleDateSelect = (date) => {
     Swal.fire({
@@ -172,6 +135,7 @@ const App = () => {
                 label="Rảnh giờ nào em?"
                 onAccept={(time) => {
                   setSelectedTime(time);
+                  setSelectedDate(date);
                   Swal.close();
                 }}
               />
@@ -180,7 +144,6 @@ const App = () => {
         }
       },
     });
-    setSelectedDate(date);
   };
 
   useEffect(() => {
@@ -190,27 +153,22 @@ const App = () => {
       const dateKey = format(selectedDate, "dd-MM-yyyy");
       const updatedChoices = [...dateChoices];
       const existingChoice = updatedChoices.find(choice => choice.date === dateKey);
-
       if (existingChoice) {
-        if (!existingChoice.people.includes(currentUser)) {
-          existingChoice.people.push(currentUser);
+        if (!existingChoice.people.includes(name)) {
+          existingChoice.people.push(name);
         }
       } else {
-        updatedChoices.push({ date: dateKey, people: [currentUser] });
+        updatedChoices.push({ date: dateKey, people: [name] });
       }
-
       setDateChoices(updatedChoices);
-      setConfirmedDate(selectedDate);
-      setIsDialogOpen(false);
-      // setName("");
-
-      // Firebase
+      
+      // Firebase write operation
       const writeUserData = async () => {
         const db = getDatabase();
         const userRef = ref(db, `users/${currentUser}/dates`);
         const snapshot = await get(userRef);
         let existingDates = [];
-
+  
         if (snapshot.exists()) {
           existingDates = snapshot.val();
         }
@@ -219,7 +177,12 @@ const App = () => {
             ? existingDates
             : [...existingDates, { date: dateKey, time: timeKey }]
           : [{ date: dateKey, time: timeKey }];
-
+        const tmp = [];
+        tmp.push({
+          name: currentUser,
+          dates: {dates: updatedDates}
+        })
+        setTransformedData(tmp);
         set(userRef, updatedDates);
       }
       writeUserData();
@@ -229,6 +192,7 @@ const App = () => {
   const getPeopleForDate = (date) => {
     const dateKey = format(date, "dd-MM-yyyy");
     const choice = dateChoices.find(c => c.date === dateKey);
+    console.log(choice);
     return choice ? choice.people : [];
   };
 
