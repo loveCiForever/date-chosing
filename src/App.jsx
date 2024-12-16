@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Swal from 'sweetalert2';
-import { format, setDate } from "date-fns";
-import Wave from 'react-wavify';
+
+import { format } from "date-fns";
 
 // MUI Time Picker
 import { LocalizationProvider, StaticTimePicker } from '@mui/x-date-pickers'
@@ -44,6 +44,7 @@ const App = () => {
   useEffect(() => {
     Swal.fire({
       title: "Nhập tên đi mấy iem",
+      text: "Sau khi nhập tên thì có em có thể chọn nhiều ngày nhé. Sau khi F5 reload trang thì phải điền lại chính xác tên lần trước nhen",
       input: "text",
       inputAttributes: {
         autocapitalize: "off"
@@ -55,7 +56,7 @@ const App = () => {
       allowEscapeKey: false,
       preConfirm: (login) => {
         if (!login) {
-          Swal.showValidationMessage("Nhập tên đi homie!");
+          Swal.showValidationMessage("Dume may điền tên vào");
           return false;
         }
         localStorage.setItem("currentUser", login);
@@ -198,7 +199,7 @@ const App = () => {
 
   const generateCalendar = () => {
     const year = 2024;
-    const month = 11;
+    const month = 11; // index start from 0
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const firstDayOfMonth = new Date(year, month, 1).getDay();
 
@@ -220,7 +221,7 @@ const App = () => {
             onClick={() => handleDateSelect(date)}
             onMouseEnter={() => setHoveredDate(date)}
             onMouseLeave={() => setHoveredDate(null)}
-            className={`sm:text-[16px] text-[14px] w-full h-full py-[6px] rounded-lg ${isTopDate ? 'bg-green-300' : 'bg-red-000'} hover:bg-pink-200`}
+            className={`sm:text-[16px] text-[14px] w-full h-full py-[6px] px-[6px] bg-red-200// rounded-lg ${isTopDate ? 'bg-green-300' : 'bg-red-000'} hover:bg-pink-200`}
           >
             {day}
           </button>
@@ -263,10 +264,8 @@ const App = () => {
 
   const renderChosenPeopleList = () => {
     return (
-      <div>
-        <h2 className="md:text-[18px] sm:text-[16px] text-[12px] font-bold mb-[10px] text-center">
-          Những bạn đã chọn ngày
-        </h2>
+      <div className="">
+        <h2 className="md:text-[18px] sm:text-[16px] text-[12px] font-bold mb-[10px] text-center">Những con tró đã chọn ngày</h2>
         <div className="h-[380px] overflow-y-auto">
           <ul className="list-container list-disc pl-7 ml-[-10px]">
             {transformedData.length === 0 ? (
